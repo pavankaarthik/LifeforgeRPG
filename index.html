@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeForge RPG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep:#0A0B0F; --bg-card:#12141A; --bg-raised:#1A1D26;
+  --accent-gold:#F5A623; --accent-cyan:#00E5FF; --accent-violet:#7B61FF;
+  --accent-red:#FF4757; --accent-green:#4ade80;
+  --text-primary:#F0F0F5; --text-muted:#6B7280;
+  --border-dim:rgba(255,255,255,0.06);
+  --glow-cyan:0 0 20px rgba(0,229,255,0.25);
+  --glow-violet:0 0 20px rgba(123,97,255,0.25);
+  --glow-gold:0 0 20px rgba(245,166,35,0.35);
+  --glow-green:0 0 16px rgba(74,222,128,0.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg-deep);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
+
+/* PARTICLES */
+.particle-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.particle-bg::before,.particle-bg::after{content:'';position:absolute;width:2px;height:2px;border-radius:50%;background:var(--accent-cyan);
+  box-shadow:120px 80px 0 var(--accent-violet),240px 160px 0 var(--accent-cyan),380px 60px 0 var(--accent-gold),500px 200px 0 var(--accent-violet),640px 120px 0 var(--accent-cyan),780px 300px 0 var(--accent-gold),900px 50px 0 var(--accent-cyan),1050px 180px 0 var(--accent-violet),80px 350px 0 var(--accent-gold),300px 450px 0 var(--accent-cyan),550px 380px 0 var(--accent-violet),750px 420px 0 var(--accent-cyan),950px 350px 0 var(--accent-gold),1100px 480px 0 var(--accent-violet),150px 600px 0 var(--accent-cyan),420px 550px 0 var(--accent-gold);
+  opacity:0.3;animation:particleFloat 22s linear infinite}
+.particle-bg::after{animation-delay:-11s;animation-duration:30s;opacity:0.18;
+  box-shadow:60px 120px 0 var(--accent-gold),200px 280px 0 var(--accent-cyan),340px 180px 0 var(--accent-violet),480px 320px 0 var(--accent-gold),620px 240px 0 var(--accent-cyan),760px 160px 0 var(--accent-violet),860px 400px 0 var(--accent-gold),1000px 260px 0 var(--accent-cyan),100px 500px 0 var(--accent-cyan),260px 580px 0 var(--accent-gold),460px 520px 0 var(--accent-violet),700px 560px 0 var(--accent-cyan)}
+@keyframes particleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-28px)}}
+
+/* HEADER */
+#header{position:sticky;top:0;z-index:100;background:rgba(10,11,15,0.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border-dim);padding:0 16px}
+.header-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:10px 0;flex-wrap:wrap}
+.app-logo{font-family:'Orbitron',monospace;font-size:13px;font-weight:900;color:var(--accent-cyan);letter-spacing:2px;white-space:nowrap}
+.header-level{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--accent-violet);background:rgba(123,97,255,0.12);border:1px solid rgba(123,97,255,0.35);border-radius:20px;padding:3px 10px;white-space:nowrap}
+.xp-bar-wrap{flex:1;min-width:100px}
+.xp-bar-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);margin-bottom:3px}
+.xp-bar-track{height:8px;background:var(--bg-raised);border-radius:4px;overflow:hidden;border:1px solid var(--border-dim)}
+.xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent-violet),var(--accent-cyan));border-radius:4px;transition:width 0.7s ease;position:relative;overflow:hidden}
+.xp-bar-fill::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:shimmer 2s ease-in-out infinite}
+@keyframes shimmer{0%{left:-60%}100%{left:120%}}
+.header-gold{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent-gold);white-space:nowrap}
+.playtime-pill{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent-green);background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.35);border-radius:20px;padding:3px 10px;white-space:nowrap;cursor:pointer;transition:all 0.2s;display:none}
+.playtime-pill:hover{box-shadow:var(--glow-green)}
+.shields-wrap{display:flex;gap:3px;align-items:center}
+.shield-icon{font-size:16px;transition:filter 0.3s}
+.shield-icon.used{filter:grayscale(1) brightness(0.4)}
+#desktop-nav{display:flex;justify-content:center;gap:4px;flex-wrap:wrap;max-width:1280px;margin:0 auto;padding:0 16px 8px}
+.nav-tab{background:transparent;border:1px solid var(--border-dim);color:var(--text-muted);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:6px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s;letter-spacing:0.5px}
+.nav-tab:hover{color:var(--accent-cyan);border-color:rgba(0,229,255,0.3)}
+.nav-tab.active{background:rgba(0,229,255,0.1);border-color:var(--accent-cyan);color:var(--accent-cyan);box-shadow:0 0 12px rgba(0,229,255,0.2)}
+#mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(10,11,15,0.97);backdrop-filter:blur(12px);border-top:1px solid var(--border-dim);padding:6px 0 calc(6px + env(safe-area-inset-bottom))}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mobile-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:8px;cursor:pointer;padding:4px;min-width:36px;min-height:44px;justify-content:center;transition:color 0.2s}
+.mobile-nav-btn .mnav-icon{font-size:17px}
+.mobile-nav-btn.active{color:var(--accent-cyan)}
+
+/* LAYOUT */
+#app{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:16px 16px 90px}
+.panel{display:none;animation:fadeIn 0.3s ease}
+.panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS */
+.card{background:var(--bg-card);border:1px solid var(--border-dim);border-radius:12px;padding:20px;transition:border-color 0.2s,box-shadow 0.2s;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;inset:0;border-radius:12px;background:linear-gradient(135deg,rgba(0,229,255,0.03),rgba(123,97,255,0.03));opacity:0;transition:opacity 0.2s;pointer-events:none}
+.card:hover{border-color:rgba(0,229,255,0.2);box-shadow:var(--glow-cyan)}
+.card:hover::before{opacity:1}
+.card-title{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:14px}
+
+/* BUTTONS */
+.btn{background:var(--bg-raised);border:1px solid var(--border-dim);color:var(--text-primary);font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.btn:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);box-shadow:var(--glow-cyan)}
+.btn-primary{background:linear-gradient(135deg,var(--accent-violet),var(--accent-cyan));border:none;color:#fff;font-weight:600}
+.btn-primary:hover{box-shadow:var(--glow-cyan);transform:translateY(-1px);color:#fff;border:none}
+.btn-danger{background:rgba(255,71,87,0.12);border-color:rgba(255,71,87,0.35);color:var(--accent-red)}
+.btn-danger:hover{background:rgba(255,71,87,0.22);border-color:var(--accent-red);box-shadow:0 0 12px rgba(255,71,87,0.3);color:var(--accent-red)}
+.btn-gold{background:rgba(245,166,35,0.1);border-color:rgba(245,166,35,0.4);color:var(--accent-gold)}
+.btn-gold:hover{background:rgba(245,166,35,0.2);border-color:var(--accent-gold);box-shadow:var(--glow-gold);color:var(--accent-gold)}
+.btn-green{background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.35);color:var(--accent-green)}
+.btn-green:hover{box-shadow:var(--glow-green);color:var(--accent-green)}
+.btn-sm{padding:4px 10px;font-size:11px}
+
+/* INPUTS */
+input[type="text"],input[type="number"],select,textarea{background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:6px;color:var(--text-primary);font-family:'Inter',sans-serif;font-size:13px;padding:8px 12px;outline:none;width:100%}
+input[type="text"]:focus,input[type="number"]:focus,select:focus,textarea:focus{border-color:var(--accent-cyan);box-shadow:0 0 8px rgba(0,229,255,0.18)}
+select option{background:var(--bg-raised)}
+textarea{resize:vertical;min-height:60px}
+
+/* UTILS */
+.section-head{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:16px;letter-spacing:1px}
+.section-sub{font-size:12px;color:var(--text-muted);margin-bottom:16px;line-height:1.6}
+.flex-row{display:flex;align-items:center;gap:10px}
+.flex-between{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mb-16{margin-bottom:16px}
+.text-muted{color:var(--text-muted);font-size:12px}
+
+/* PROFILE */
+.character-layout{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:768px){.character-layout{grid-template-columns:300px 1fr}}
+
+/* AVATAR */
+.avatar-card{display:flex;flex-direction:column;align-items:center;gap:14px}
+.avatar-outer{position:relative;width:140px;height:140px}
+.avatar-photo{width:140px;height:140px;border-radius:50%;object-fit:cover;border:3px solid var(--accent-cyan);box-shadow:0 0 24px rgba(0,229,255,0.35);display:none}
+.avatar-svg-wrap{width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid rgba(123,97,255,0.55);box-shadow:0 0 24px rgba(123,97,255,0.25)}
+.avatar-svg{width:100%;height:100%}
+.avatar-glow{position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,255,0.14) 0%,transparent 70%);animation:avatarPulse 3s ease-in-out infinite;pointer-events:none}
+@keyframes avatarPulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+.avatar-upload-zone{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0);transition:background 0.2s;cursor:pointer;z-index:3}
+.avatar-upload-zone:hover{background:rgba(0,0,0,0.5)}
+.avatar-upload-zone:hover .upload-hover-label{opacity:1}
+.upload-hover-label{opacity:0;transition:opacity 0.2s;font-size:11px;color:#fff;text-align:center;line-height:1.4;pointer-events:none}
+.upload-hover-label .upload-icon{font-size:22px;display:block;margin-bottom:4px}
+#avatar-file-input{display:none}
+.avatar-upload-strip{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.player-name{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--text-primary);cursor:pointer;border-bottom:1px dashed var(--text-muted);display:inline-block;transition:border-color 0.2s}
+.player-name:hover{border-color:var(--accent-cyan)}
+.player-title{font-size:11px;color:var(--accent-gold);margin-top:4px;font-weight:500}
+.level-badge{font-family:'Orbitron',monospace;font-size:26px;font-weight:900;color:var(--accent-violet);background:rgba(123,97,255,0.12);border:2px solid rgba(123,97,255,0.5);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;box-shadow:var(--glow-violet)}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(min-width:480px){.stats-grid{grid-template-columns:repeat(5,1fr)}}
+.stat-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:5px}
+.stat-ring{position:relative;width:60px;height:60px}
+.stat-ring svg{transform:rotate(-90deg);width:60px;height:60px}
+.stat-ring-bg{fill:none;stroke:var(--bg-raised);stroke-width:5}
+.stat-ring-fill{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:163;stroke-dashoffset:163;transition:stroke-dashoffset 0.8s ease}
+.stat-ring-val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500}
+.stat-ring-label{font-size:9px;color:var(--text-muted);text-align:center;font-weight:500;line-height:1.3}
+
+/* QUESTS */
+.quest-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:8px;margin-bottom:8px;transition:all 0.3s}
+.quest-item.completed{opacity:0.45;filter:grayscale(0.5)}
+.quest-item.custom-quest{border-color:rgba(245,166,35,0.25)}
+.quest-checkbox{width:22px;height:22px;flex-shrink:0;accent-color:var(--accent-cyan);cursor:pointer}
+.quest-icon{font-size:20px;flex-shrink:0}
+.quest-info{flex:1;min-width:0}
+.quest-title{font-size:13px;font-weight:500;color:var(--text-primary)}
+.quest-meta{display:flex;gap:8px;margin-top:3px;flex-wrap:wrap}
+.quest-xp{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent-gold)}
+.quest-stat{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent-cyan);text-transform:uppercase}
+.custom-badge{font-size:9px;color:var(--accent-gold);background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.3);border-radius:4px;padding:1px 5px}
+.loot-box-btn{display:none;width:100%;margin-top:12px;padding:12px;font-size:14px;animation:pulseBorder 2s ease-in-out infinite}
+@keyframes pulseBorder{0%,100%{box-shadow:0 0 0 rgba(245,166,35,0)}50%{box-shadow:0 0 22px rgba(245,166,35,0.5)}}
+
+/* BOSS */
+
+
+/* SKILL TREE */
+.skill-trees-wrap{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:768px){.skill-trees-wrap{grid-template-columns:repeat(3,1fr)}}
+.skill-tree-card{text-align:center}
+.tree-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:14px;letter-spacing:2px}
+.skill-node{display:inline-flex;align-items:center;justify-content:center;width:76px;height:76px;border-radius:50%;border:2px solid var(--text-muted);background:var(--bg-deep);margin:5px auto;font-size:10px;color:var(--text-muted);transition:all 0.3s;flex-direction:column;gap:2px}
+.skill-node .sn-icon{font-size:20px}
+.skill-node .sn-label{font-size:9px}
+.skill-node.unlocked{border-color:var(--accent-cyan);color:var(--accent-cyan);box-shadow:0 0 14px rgba(0,229,255,0.3)}
+.skill-node.current{border-color:var(--accent-gold);color:var(--accent-gold);animation:nodePulse 2s ease-in-out infinite}
+@keyframes nodePulse{0%,100%{box-shadow:0 0 10px rgba(245,166,35,0.3)}50%{box-shadow:0 0 26px rgba(245,166,35,0.6)}}
+.skill-connector{width:2px;height:20px;background:var(--border-dim);margin:0 auto}
+.skill-connector.active{background:var(--accent-cyan)}
+.skill-node-tip{font-size:10px;color:var(--text-muted);margin-bottom:6px;font-style:italic}
+
+/* ACHIEVEMENTS */
+.achievements-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:640px){.achievements-grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:1024px){.achievements-grid{grid-template-columns:repeat(4,1fr)}}
+.achievement-badge{background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:10px;padding:14px;text-align:center;transition:all 0.3s}
+.achievement-badge.unlocked{border-color:rgba(245,166,35,0.4);box-shadow:0 0 14px rgba(245,166,35,0.12)}
+.achievement-badge.locked{filter:grayscale(1) brightness(0.35)}
+.ach-icon{font-size:26px;margin-bottom:6px;display:block}
+.ach-title{font-size:11px;font-weight:600;color:var(--text-primary)}
+.ach-desc{font-size:10px;color:var(--text-muted);margin-top:3px;line-height:1.4}
+
+/* STATS DASHBOARD */
+.stat-bar-wrap{margin-bottom:12px}
+.stat-bar-info{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);margin-bottom:4px}
+.stat-bar-info span:last-child{color:var(--accent-cyan)}
+.stat-bar-track{height:10px;background:var(--bg-raised);border-radius:5px;overflow:hidden;border:1px solid var(--border-dim)}
+.stat-bar-fill{height:100%;border-radius:5px;transition:width 0.6s ease;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-violet));position:relative;overflow:hidden}
+.stat-bar-fill::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);animation:shimmer 2.5s ease-in-out infinite}
+.dashboard-stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+@media(min-width:640px){.dashboard-stats-grid{grid-template-columns:repeat(3,1fr)}}
+.dash-stat{background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:8px;padding:14px;text-align:center}
+.dash-stat-val{font-family:'Orbitron',monospace;font-size:22px;font-weight:900;color:var(--accent-cyan)}
+.dash-stat-label{font-size:10px;color:var(--text-muted);margin-top:3px;font-weight:500;letter-spacing:0.5px}
+
+/* ============================================================
+   WORLD MAP STORY MODE
+   ============================================================ */
+#worldmap-container{position:relative;width:100%;background:var(--bg-card);border:1px solid var(--border-dim);border-radius:16px;overflow:hidden;min-height:520px}
+#worldmap-canvas{display:block;width:100%;cursor:grab;touch-action:none;image-rendering:crisp-edges}
+#worldmap-canvas:active{cursor:grabbing}
+/* World legend / header bar */
+.wm-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(10,11,15,0.7);border-bottom:1px solid var(--border-dim);flex-wrap:wrap;gap:8px}
+.wm-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--accent-gold);letter-spacing:2px}
+.wm-legend{display:flex;gap:14px;flex-wrap:wrap}
+.wm-leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-muted)}
+.wm-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* Stage detail card (slides up from bottom) */
+#stage-detail{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(0deg,rgba(10,11,15,0.98) 0%,rgba(18,20,26,0.97) 100%);border-top:1px solid var(--border-dim);padding:16px 20px;transform:translateY(100%);transition:transform 0.35s cubic-bezier(0.34,1.2,0.64,1);z-index:10;border-radius:0 0 16px 16px}
+#stage-detail.open{transform:translateY(0)}
+.sd-close{position:absolute;top:10px;right:14px;background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;line-height:1;padding:4px;border-radius:4px;transition:color 0.2s}
+.sd-close:hover{color:var(--text-primary)}
+.sd-world-tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.sd-stage-name{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
+.sd-story-text{font-size:13px;color:var(--text-muted);line-height:1.65;font-style:italic;margin-bottom:12px}
+.sd-meta-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sd-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:3px 8px;border-radius:4px;border:1px solid;white-space:nowrap}
+.sd-badge.locked{color:var(--text-muted);border-color:var(--border-dim)}
+.sd-badge.completed{color:var(--accent-green);border-color:rgba(74,222,128,0.35);background:rgba(74,222,128,0.08)}
+.sd-badge.active{color:var(--accent-cyan);border-color:rgba(0,229,255,0.35);background:rgba(0,229,255,0.08)}
+.sd-badge.boss{color:var(--accent-red);border-color:rgba(255,71,87,0.35);background:rgba(255,71,87,0.08)}
+.sd-badge.current{color:var(--accent-gold);border-color:rgba(245,166,35,0.4);background:rgba(245,166,35,0.1)}
+.sd-complete-btn{margin-left:auto;flex-shrink:0}
+/* World selector tabs */
+.world-tabs{display:flex;gap:6px;padding:10px 14px;background:rgba(10,11,15,0.5);overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border-dim)}
+.world-tabs::-webkit-scrollbar{display:none}
+.world-tab-btn{flex-shrink:0;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;padding:5px 12px;border-radius:6px;border:1px solid var(--border-dim);background:var(--bg-raised);color:var(--text-muted);cursor:pointer;transition:all 0.2s;letter-spacing:1px;white-space:nowrap}
+.world-tab-btn.active{color:#fff;border-color:transparent}
+/* Add world form */
+.add-world-form{background:var(--bg-raised);border:1px solid rgba(245,166,35,0.2);border-radius:10px;padding:16px;margin-bottom:16px}
+.add-world-title{font-size:12px;font-weight:600;color:var(--accent-gold);margin-bottom:12px}
+.add-stage-form{background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:10px;padding:14px;margin-bottom:10px}
+/* Stage node completion glow pulse */
+@keyframes stageGlowPulse{0%,100%{opacity:0.5}50%{opacity:1}}
+/* World map floating tooltip */
+#wm-tooltip{position:absolute;pointer-events:none;z-index:20;background:rgba(10,11,15,0.95);border:1px solid var(--border-dim);border-radius:8px;padding:7px 11px;font-size:11px;color:var(--text-primary);white-space:nowrap;opacity:0;transition:opacity 0.15s;box-shadow:0 4px 16px rgba(0,0,0,0.5)}
+#wm-tooltip.visible{opacity:1}
+
+/* PENALTIES */
+.penalty-preset-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-raised);border:1px solid rgba(255,71,87,0.2);border-radius:8px;margin-bottom:8px;transition:all 0.2s}
+.penalty-preset-item:hover{border-color:rgba(255,71,87,0.4)}
+.pen-icon{font-size:18px;flex-shrink:0}
+.pen-info{flex:1;min-width:0}
+.pen-name{font-size:12px;font-weight:600;color:var(--text-primary)}
+.pen-desc{font-size:10px;color:var(--accent-red);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.pen-apply-btn{background:rgba(255,71,87,0.12);border:1px solid rgba(255,71,87,0.35);color:var(--accent-red);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.pen-apply-btn:hover{background:rgba(255,71,87,0.25);box-shadow:0 0 10px rgba(255,71,87,0.3)}
+.penalty-log-item{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,71,87,0.05);border:1px solid rgba(255,71,87,0.12);border-radius:7px;margin-bottom:6px;font-size:11px}
+.penalty-log-item .plog-icon{font-size:16px;flex-shrink:0}
+.penalty-log-item .plog-name{color:var(--text-primary);font-weight:500;flex:1}
+.penalty-log-item .plog-effect{color:var(--accent-red);font-family:'JetBrains Mono',monospace;font-size:10px;white-space:nowrap}
+.penalty-log-item .plog-date{color:var(--text-muted);font-size:9px;white-space:nowrap}
+/* Penalty flash overlay */
+#penalty-flash{display:none;position:fixed;inset:0;z-index:600;background:rgba(255,71,87,0.3);pointer-events:none}
+#penalty-flash.show{display:block;animation:penFlash 0.8s ease forwards}
+@keyframes penFlash{0%{opacity:1}30%{opacity:0.6}60%{opacity:1}100%{opacity:0}}
+.penalty-toast{background:linear-gradient(135deg,#c0392b,#FF4757)!important}
+/* Stat tier progress */
+.stat-tier-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.stat-tier-label{width:80px;font-size:11px;color:var(--text-muted);flex-shrink:0}
+.stat-tier-track{flex:1;height:8px;background:var(--bg-deep);border-radius:4px;overflow:hidden;border:1px solid var(--border-dim)}
+.stat-tier-fill{height:100%;border-radius:4px;transition:width 0.6s ease;position:relative;overflow:hidden}
+.stat-tier-fill::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);animation:shimmer 2s ease-in-out infinite}
+.stat-tier-val{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);white-space:nowrap;min-width:80px;text-align:right}
+
+/* EDIT MODE */
+.edit-mode-banner{background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.3);border-radius:8px;padding:10px 14px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--accent-gold)}
+.edit-section{margin-bottom:28px}
+.edit-section-title{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border-dim)}
+.edit-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.edit-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:8px}
+.edit-item-icon{font-size:18px;flex-shrink:0}
+.edit-item-name{flex:1;font-size:12px;color:var(--text-primary);min-width:0}
+.edit-item-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);white-space:nowrap}
+.edit-item-remove{background:none;border:none;color:var(--accent-red);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:4px;transition:background 0.2s;flex-shrink:0}
+.edit-item-remove:hover{background:rgba(255,71,87,0.15)}
+.add-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:10px;color:var(--text-muted);font-weight:500;letter-spacing:0.3px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-dim);gap:10px}
+.settings-row:last-child{border-bottom:none}
+.stat-name-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:14px}
+.stat-name-item{display:flex;flex-direction:column;gap:4px}
+.stat-name-label{font-size:10px;color:var(--text-muted)}
+.ach-edit-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.ach-edit-row{background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:8px;padding:12px}
+.ach-edit-top{display:grid;grid-template-columns:52px 1fr 1fr;gap:8px;align-items:center;margin-bottom:8px}
+.ach-edit-icon-input{font-size:22px;text-align:center;padding:4px;background:var(--bg-deep);border:1px solid var(--border-dim);border-radius:6px;width:52px;height:42px}
+.ach-edit-field{font-size:12px;background:var(--bg-deep);border:1px solid var(--border-dim);border-radius:6px;padding:6px 8px;color:var(--text-primary);width:100%}
+.ach-edit-story{font-size:11px;background:var(--bg-deep);border:1px solid var(--border-dim);border-radius:6px;padding:6px 8px;color:var(--text-muted);width:100%}
+.playtime-config-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.playtime-config-row label{font-size:13px;color:var(--text-primary)}
+
+/* ==== LEVEL UP OVERLAY ==== */
+#levelup-overlay{display:none;position:fixed;inset:0;z-index:900;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;cursor:pointer}
+#levelup-overlay.show{display:flex}
+.lvl-bg{position:absolute;inset:0;background:rgba(0,0,0,0.92);animation:lvlBgIn 0.3s ease}
+@keyframes lvlBgIn{from{opacity:0}to{opacity:1}}
+/* Burst rings */
+.lvl-ring{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid var(--accent-gold);top:50%;left:50%;transform:translate(-50%,-50%);animation:ringExpand 1.2s ease-out forwards}
+.lvl-ring:nth-child(2){border-color:var(--accent-cyan);animation-delay:0.15s;border-width:3px}
+.lvl-ring:nth-child(3){border-color:var(--accent-violet);animation-delay:0.3s}
+@keyframes ringExpand{0%{width:10px;height:10px;opacity:1}100%{width:700px;height:700px;opacity:0;margin-left:-345px;margin-top:-345px}}
+/* Rays */
+.lvl-rays{position:absolute;inset:0;pointer-events:none}
+.lvl-ray{position:absolute;left:50%;top:50%;width:2px;background:linear-gradient(0deg,rgba(245,166,35,0.9),transparent);transform-origin:bottom center;animation:rayFire 0.8s ease-out forwards;opacity:0}
+@keyframes rayFire{0%{opacity:0;height:0}30%{opacity:1}100%{opacity:0;height:260px}}
+/* Stars burst */
+.lvl-star{position:absolute;font-size:20px;animation:starBurst 1s ease-out forwards;opacity:0}
+@keyframes starBurst{0%{opacity:0;transform:translate(0,0) scale(0)}50%{opacity:1}100%{opacity:0;transform:var(--tx) scale(1.5)}}
+/* Content */
+.lvl-content{position:relative;z-index:2;text-align:center;pointer-events:none}
+.lvl-label{font-family:'Orbitron',monospace;font-size:clamp(13px,3vw,20px);font-weight:700;color:var(--accent-gold);letter-spacing:10px;text-transform:uppercase;animation:lvlTextIn 0.5s ease forwards;opacity:0}
+@keyframes lvlTextIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.lvl-number{font-family:'Orbitron',monospace;font-size:clamp(80px,22vw,160px);font-weight:900;color:#fff;line-height:1;text-shadow:0 0 80px rgba(123,97,255,1),0 0 160px rgba(0,229,255,0.6);animation:lvlNumIn 0.6s 0.2s cubic-bezier(0.34,1.56,0.64,1) forwards;opacity:0;display:block}
+@keyframes lvlNumIn{from{transform:scale(0.1) rotate(-15deg);opacity:0}60%{transform:scale(1.08) rotate(2deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+.lvl-title{font-family:'Inter',sans-serif;font-size:clamp(14px,3vw,22px);color:var(--accent-cyan);margin-top:4px;font-weight:600;letter-spacing:4px;text-transform:uppercase;animation:lvlTextIn 0.4s 0.5s ease forwards;opacity:0}
+.lvl-hint{font-size:12px;color:rgba(107,114,128,0.7);margin-top:24px;animation:lvlTextIn 0.4s 1.2s ease forwards;opacity:0}
+
+/* Confetti */
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:901;overflow:hidden}
+.c-piece{position:absolute;top:-12px;animation:cFall linear forwards}
+@keyframes cFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(900deg);opacity:0}}
+
+/* ==== ACHIEVEMENT POPUP ==== */
+#ach-popup{position:fixed;bottom:24px;right:24px;z-index:800;display:none;max-width:310px;width:calc(100% - 32px)}
+#ach-popup.show{display:block;animation:achPopIn 0.55s cubic-bezier(0.34,1.56,0.64,1) forwards}
+#ach-popup.hide{display:block;animation:achPopOut 0.4s ease forwards}
+@keyframes achPopIn{from{transform:translateX(120%) scale(0.7);opacity:0}to{transform:translateX(0) scale(1);opacity:1}}
+@keyframes achPopOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
+.ach-popup-inner{background:var(--bg-card);border:2px solid var(--accent-gold);border-radius:16px;padding:16px 18px;box-shadow:0 0 40px rgba(245,166,35,0.35),0 8px 32px rgba(0,0,0,0.6);display:flex;gap:14px;align-items:center;position:relative;overflow:hidden}
+.ach-popup-inner::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,166,35,0.07),transparent);pointer-events:none}
+.ach-popup-icon{font-size:44px;flex-shrink:0;animation:achIconBounce 0.7s cubic-bezier(0.34,1.56,0.64,1);filter:drop-shadow(0 0 12px rgba(245,166,35,0.9))}
+@keyframes achIconBounce{from{transform:scale(0) rotate(-180deg)}to{transform:scale(1) rotate(0)}}
+.ach-popup-body{}
+.ach-popup-tag{font-family:'Orbitron',monospace;font-size:9px;letter-spacing:3px;color:var(--accent-gold);text-transform:uppercase;margin-bottom:4px}
+.ach-popup-name{font-size:16px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.ach-popup-desc{font-size:11px;color:var(--text-muted);line-height:1.4}
+/* Sparkle particles on popup */
+.ach-sparkle{position:absolute;pointer-events:none;font-size:16px;animation:sparkleFly 1s ease-out forwards;opacity:0}
+@keyframes sparkleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:var(--sx,0) var(--sy,-40px) scale(0)}}
+
+/* LOOT / MODALS */
+#loot-modal{display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,0.82);align-items:center;justify-content:center;padding:20px}
+#loot-modal.show{display:flex}
+.loot-modal-inner{background:var(--bg-card);border:1px solid rgba(245,166,35,0.4);border-radius:16px;padding:30px;max-width:340px;width:100%;text-align:center;box-shadow:0 0 40px rgba(245,166,35,0.18);animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes popIn{from{transform:scale(0.7) rotateY(-20deg);opacity:0}to{transform:scale(1) rotateY(0);opacity:1}}
+.loot-icon{font-size:50px;margin-bottom:10px;display:block;animation:spinIn 0.5s ease}
+@keyframes spinIn{from{transform:rotateY(180deg) scale(0.5);opacity:0}to{transform:rotateY(0) scale(1);opacity:1}}
+.loot-rarity{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:2px;margin-bottom:6px}
+.rarity-common{color:var(--text-muted)}.rarity-uncommon{color:var(--accent-green)}.rarity-rare{color:var(--accent-cyan)}.rarity-epic{color:var(--accent-violet)}
+.loot-label{font-size:20px;font-weight:700;color:var(--accent-gold);margin-bottom:18px}
+#flee-flash{display:none;position:fixed;inset:0;z-index:600;background:rgba(255,71,87,0.35);pointer-events:none}
+#flee-flash.show{display:block;animation:flashFade 0.7s ease forwards}
+@keyframes flashFade{0%{opacity:1}100%{opacity:0}}
+#victory-flash{display:none;position:fixed;inset:0;z-index:600;pointer-events:none}
+#victory-flash.show{display:block;animation:victoryShake 0.65s ease;background:radial-gradient(circle,rgba(0,229,255,0.2) 0%,transparent 70%)}
+@keyframes victoryShake{0%,100%{transform:translate(0)}10%{transform:translate(-5px,5px)}20%{transform:translate(5px,-5px)}30%{transform:translate(-5px,-5px)}40%{transform:translate(5px,5px)}50%{transform:translate(-3px,3px)}60%{transform:translate(3px,-3px)}}
+
+/* PLAYTIME */
+#playtime-modal{display:none;position:fixed;inset:0;z-index:700;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:20px}
+#playtime-modal.show{display:flex}
+.playtime-modal-inner{background:var(--bg-card);border:1px solid rgba(74,222,128,0.4);border-radius:16px;padding:28px;max-width:420px;width:100%;text-align:center;box-shadow:0 0 40px rgba(74,222,128,0.18);animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)}
+.pt-trophy{font-size:52px;margin-bottom:10px;display:block;animation:spinIn 0.5s ease}
+.pt-title{font-family:'Orbitron',monospace;font-size:18px;font-weight:900;color:var(--accent-green);margin-bottom:8px}
+.pt-sub{font-size:13px;color:var(--text-muted);margin-bottom:18px;line-height:1.5}
+.pt-timer{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;color:var(--accent-green);letter-spacing:3px;margin:12px 0;text-shadow:0 0 16px rgba(74,222,128,0.4)}
+.pt-bar-track{height:12px;background:var(--bg-raised);border-radius:6px;overflow:hidden;border:1px solid var(--border-dim)}
+.pt-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent-green),#22c55e);border-radius:6px;transition:width 1s linear;position:relative;overflow:hidden}
+.pt-bar-fill::after{content:'';position:absolute;top:0;left:-60%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.35),transparent);animation:shimmer 1.5s ease-in-out infinite}
+.pt-acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.pt-act{background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:8px;padding:10px 6px;text-align:center;cursor:pointer;transition:all 0.2s}
+.pt-act:hover{border-color:var(--accent-green);box-shadow:var(--glow-green)}
+.pt-act-icon{font-size:22px;display:block;margin-bottom:3px}
+.pt-act-label{font-size:9px;color:var(--text-muted)}
+
+/* TOAST */
+.xp-toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--accent-violet),var(--accent-cyan));color:#fff;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;padding:8px 20px;border-radius:20px;pointer-events:none;z-index:1000;white-space:nowrap;animation:floatUp 2s ease forwards}
+@keyframes floatUp{0%{opacity:0;transform:translateX(-50%) translateY(0)}15%{opacity:1;transform:translateX(-50%) translateY(-10px)}80%{opacity:1;transform:translateX(-50%) translateY(-32px)}100%{opacity:0;transform:translateX(-50%) translateY(-52px)}}
+
+@media(max-width:639px){#desktop-nav{display:none}#mobile-nav{display:block}}
+@media(min-width:640px){#desktop-nav{display:flex}#mobile-nav{display:none}#app{padding-bottom:24px}}
+</style>
+</head>
+<body>
+<div class="particle-bg"></div>
+
+<header id="header">
+  <div class="header-inner">
+    <div class="app-logo" id="app-name-label">LIFEFORGE</div>
+    <div class="header-level" id="header-level-badge">LV 1</div>
+    <div class="xp-bar-wrap">
+      <div class="xp-bar-label" id="xp-bar-label">0 / 1000 XP</div>
+      <div class="xp-bar-track"><div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div></div>
+    </div>
+    <div class="header-gold" id="header-gold">🪙 0</div>
+    <div class="playtime-pill" id="playtime-pill" onclick="openPlaytime()">🎮 Play!</div>
+    <div class="shields-wrap" id="shields-wrap"></div>
+  </div>
+  <nav id="desktop-nav">
+    <button class="nav-tab active" data-tab="quests">⚔️ Quests</button>
+    <button class="nav-tab" data-tab="skills">🌿 Skills</button>
+    <button class="nav-tab" data-tab="story">📖 Story</button>
+    <button class="nav-tab" data-tab="achievements">🏆 Awards</button>
+    <button class="nav-tab" data-tab="stats">📊 Stats</button>
+    <button class="nav-tab" data-tab="edit">✏️ Edit</button>
+    <button class="nav-tab" data-tab="profile">👤 Profile</button>
+  </nav>
+</header>
+
+<main id="app">
+
+<!-- QUESTS -->
+<section class="panel active" id="panel-quests">
+  <div class="flex-between mb-16">
+    <h2 class="section-head">Daily Quests</h2>
+    <div class="flex-row">
+      <button class="btn" onclick="refreshQuests()">🔄 Refresh</button>
+      <button class="btn btn-gold btn-sm" onclick="switchTab('edit')">✏️ Add Quest</button>
+    </div>
+  </div>
+  <div id="quest-list"></div>
+  <button class="btn btn-primary loot-box-btn" id="loot-box-btn" onclick="openLootBox()">🎁 Open Mystery Loot Box!</button>
+</section>
+
+<!-- SKILLS -->
+<section class="panel" id="panel-skills">
+  <h2 class="section-head">Skill Tree</h2>
+  <div class="skill-trees-wrap" id="skill-trees-wrap"></div>
+</section>
+
+<!-- STORY WORLD MAP -->
+<section class="panel" id="panel-story">
+  <div class="flex-between mb-16">
+    <div>
+      <h2 class="section-head" style="margin-bottom:4px">🗺️ World Map — <span id="story-name" style="color:var(--accent-gold)">Hero</span>'s Journey</h2>
+      <div class="text-muted">Tap a stage node to view its story. Complete stages to unlock the path ahead.</div>
+    </div>
+    <button class="btn btn-gold btn-sm" onclick="switchTab('edit');setTimeout(()=>document.getElementById('edit-world-section').scrollIntoView({behavior:'smooth'}),200)">✏️ Edit Worlds</button>
+  </div>
+  <!-- World selector tabs -->
+  <div class="world-tabs" id="world-tabs"></div>
+  <!-- Canvas world map -->
+  <div id="worldmap-container">
+    <div class="wm-header">
+      <div class="wm-title" id="wm-world-title">SELECT A WORLD</div>
+      <div class="wm-legend">
+        <div class="wm-leg-item"><div class="wm-leg-dot" style="background:#4ade80;box-shadow:0 0 6px #4ade80"></div>Completed</div>
+        <div class="wm-leg-item"><div class="wm-leg-dot" style="background:#F5A623;box-shadow:0 0 6px #F5A623"></div>Active</div>
+        <div class="wm-leg-item"><div class="wm-leg-dot" style="background:#6B7280"></div>Locked</div>
+        <div class="wm-leg-item"><div class="wm-leg-dot" style="background:#FF4757;box-shadow:0 0 6px #FF4757"></div>Boss</div>
+      </div>
+    </div>
+    <canvas id="worldmap-canvas"></canvas>
+    <!-- Stage detail panel -->
+    <div id="stage-detail">
+      <button class="sd-close" onclick="closeStageDetail()">✕</button>
+      <div class="sd-world-tag" id="sd-world-tag">WORLD 1</div>
+      <div class="sd-stage-name" id="sd-stage-name">Stage Name</div>
+      <div class="sd-story-text" id="sd-story-text">Story text here...</div>
+      <div class="sd-meta-row">
+        <span class="sd-badge" id="sd-status-badge">Locked</span>
+        <span class="sd-badge" id="sd-type-badge">Quest</span>
+        <span class="sd-badge" id="sd-date-badge" style="display:none"></span>
+        <button class="btn btn-primary btn-sm sd-complete-btn" id="sd-complete-btn" onclick="completeCurrentStage()">✅ Mark Complete</button>
+      </div>
+    </div>
+    <!-- Floating tooltip -->
+    <div id="wm-tooltip"></div>
+  </div>
+</section>
+
+<!-- ACHIEVEMENTS -->
+<section class="panel" id="panel-achievements">
+  <div class="flex-between mb-16">
+    <h2 class="section-head">Achievements</h2>
+    <button class="btn btn-gold btn-sm" id="ach-edit-toggle-btn" onclick="toggleAchEditMode()">✏️ Edit Awards</button>
+  </div>
+
+  <!-- EDIT MODE INLINE FORM (hidden by default) -->
+  <div id="ach-inline-editor" style="display:none;margin-bottom:20px">
+    <div class="card" style="border-color:rgba(245,166,35,0.3);background:rgba(245,166,35,0.03)">
+      <div class="card-title">✏️ Edit & Add Awards</div>
+
+      <!-- Existing achievement editor rows -->
+      <div id="ach-edit-rows" style="margin-bottom:16px"></div>
+
+      <!-- Add new achievement -->
+      <div style="border-top:1px solid var(--border-dim);padding-top:14px;margin-top:4px">
+        <div style="font-size:11px;font-family:'Orbitron',monospace;letter-spacing:1.5px;color:var(--accent-gold);margin-bottom:10px">➕ ADD NEW AWARD</div>
+        <div class="add-form-grid" style="margin-bottom:10px">
+          <div class="form-group"><label class="form-label">Icon</label><input type="text" id="na-icon" placeholder="🌟" maxlength="4" style="text-align:center;font-size:20px"></div>
+          <div class="form-group"><label class="form-label">Title</label><input type="text" id="na-title" placeholder="e.g. Iron Discipline"></div>
+          <div class="form-group"><label class="form-label">Description</label><input type="text" id="na-desc" placeholder="e.g. Complete 50 quests"></div>
+          <div class="form-group"><label class="form-label">Trigger Type</label>
+            <select id="na-trigger-type">
+              <option value="manual">Manual (apply from here)</option>
+              <option value="xp">Total XP ≥</option>
+              <option value="quests">Quests completed ≥</option>
+              <option value="streak">Day streak ≥</option>
+              <option value="gold">Gold accumulated ≥</option>
+              <option value="stat">Stat value ≥</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Trigger Value</label><input type="number" id="na-trigger-val" placeholder="e.g. 100" min="1"></div>
+          <div class="form-group"><label class="form-label">Stat (if stat trigger)</label>
+            <select id="na-trigger-stat"><option value="">—</option><option value="knowledge">Knowledge</option><option value="strength">Strength</option><option value="endurance">Endurance</option><option value="wisdom">Wisdom</option><option value="focus">Focus</option></select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px"><label class="form-label">Story Text (use {name} for player name)</label>
+          <input type="text" id="na-story" placeholder="{name} earned this by sheer determination and force of will.">
+        </div>
+        <button class="btn btn-gold" onclick="addNewAchievement()">➕ Add Award</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:14px;border-top:1px solid var(--border-dim);padding-top:12px">
+        <button class="btn btn-primary" onclick="saveAchievementsInline()">💾 Save All Changes</button>
+        <button class="btn" onclick="toggleAchEditMode()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AWARD GRID -->
+  <div class="achievements-grid" id="achievements-grid"></div>
+</section>
+
+<!-- STATS -->
+<section class="panel" id="panel-stats">
+  <h2 class="section-head">Life Dashboard</h2>
+  <div class="dashboard-stats-grid" id="dashboard-stats-grid"></div>
+  <div class="card"><div class="card-title">Character Stats</div><div id="stat-bars-wrap"></div></div>
+</section>
+
+<!-- EDIT MODE -->
+<section class="panel" id="panel-edit">
+  <h2 class="section-head">✏️ Edit Mode</h2>
+  <div class="edit-mode-banner"><span>⚡</span><span>Customize everything below. All changes persist automatically.</span></div>
+
+  <!-- EXPONENTIAL SCALING CONFIG -->
+  <div class="edit-section">
+    <div class="edit-section-title">⚡ XP & Stat Scaling</div>
+    <p class="section-sub">Both XP and stats use <strong>exponential curves</strong> — easy at the start, increasingly hard as you level up. Adjust the base values and growth multipliers below. Changes apply immediately.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <!-- XP scaling -->
+      <div class="card" style="padding:14px;border-color:rgba(0,229,255,0.2)">
+        <div style="font-size:10px;font-family:'Orbitron',monospace;letter-spacing:2px;color:var(--accent-cyan);margin-bottom:10px">XP TO LEVEL UP</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5">Formula: <code style="color:var(--accent-cyan)">XP = Base × Scale^(Level−1)</code><br>At Scale 1.25: Lvl1→2 is 200 XP, Lvl10→11 is ~1490 XP, Lvl20→21 is ~17K XP.</p>
+        <div class="add-form-grid" style="margin-bottom:8px">
+          <div class="form-group">
+            <label class="form-label">Base XP (Level 1→2)</label>
+            <input type="number" id="cfg-xp-base" min="50" max="5000" step="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Growth Multiplier (1.0–2.5)</label>
+            <input type="number" id="cfg-xp-scale" min="1.0" max="2.5" step="0.05">
+          </div>
+        </div>
+      </div>
+
+      <!-- Stat scaling -->
+      <div class="card" style="padding:14px;border-color:rgba(245,166,35,0.2)">
+        <div style="font-size:10px;font-family:'Orbitron',monospace;letter-spacing:2px;color:var(--accent-gold);margin-bottom:10px">STAT POINTS PER TIER</div>
+        <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;line-height:1.5">Formula: <code style="color:var(--accent-gold)">Pts = Base × Scale^Tier</code><br>Tier 1 is full gain (DR 100%), each tier reduces effectiveness by ~30%.</p>
+        <div class="add-form-grid" style="margin-bottom:8px">
+          <div class="form-group">
+            <label class="form-label">Base Pts (Tier 1)</label>
+            <input type="number" id="cfg-stat-base" min="1" max="100" step="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Growth Multiplier (1.0–3.0)</label>
+            <input type="number" id="cfg-stat-scale" min="1.0" max="3.0" step="0.1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn btn-primary" onclick="saveScalingCfg()">💾 Save Scaling</button>
+      <button class="btn btn-sm" onclick="resetScalingCfg()">↺ Reset Defaults</button>
+    </div>
+
+    <!-- Live preview tables -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:10px;font-family:'Orbitron',monospace;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px">XP CURVE PREVIEW</div>
+        <div id="scaling-xp-preview" style="background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:8px;padding:10px"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-family:'Orbitron',monospace;letter-spacing:1px;color:var(--text-muted);margin-bottom:6px">STAT DR PREVIEW</div>
+        <div id="scaling-stat-preview" style="background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:8px;padding:10px"></div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;padding:10px 12px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);border-radius:8px;font-size:11px;color:var(--text-muted);line-height:1.6">
+      💡 <strong style="color:var(--text-primary)">You are currently Level <span id="current-lvl-preview">1</span></strong> · 
+      Next level needs <strong style="color:var(--accent-cyan)" id="next-lvl-xp-preview">200</strong> XP · 
+      Total XP earned: <strong style="color:var(--accent-violet)" id="total-xp-preview">0</strong>
+    </div>
+  </div>
+
+  <!-- RENAME STATS -->
+  <div class="edit-section">
+    <div class="edit-section-title">🏷️ Rename Stats</div>
+    <p class="section-sub">Give stats custom names that match your real goals. The internal key stays the same, only the display name changes.</p>
+    <div class="stat-name-grid" id="stat-name-editor"></div>
+    <button class="btn btn-primary btn-sm" onclick="saveStatNames()">💾 Save Names</button>
+  </div>
+
+  <!-- PENALTIES -->
+  <div class="edit-section">
+    <div class="edit-section-title">💀 Penalties & Deductions</div>
+    <p class="section-sub">Apply real consequences. Penalties deduct XP and/or stat points. They persist in your log. You can add custom penalties or use quick-apply presets.</p>
+
+    <!-- Active Penalty Pool -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;font-family:'Orbitron',monospace;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px">PENALTY PRESETS</div>
+      <div id="penalty-presets-list"></div>
+    </div>
+
+    <!-- Quick Apply -->
+    <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.25);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--accent-red);font-weight:600;margin-bottom:10px">⚡ Quick Apply Penalty</div>
+      <div class="add-form-grid" style="margin-bottom:10px">
+        <div class="form-group"><label class="form-label">Icon</label><input type="text" id="pen-icon" placeholder="💀" maxlength="4" style="text-align:center;font-size:18px"></div>
+        <div class="form-group"><label class="form-label">Penalty Name</label><input type="text" id="pen-name" placeholder="e.g. Skipped Workout"></div>
+        <div class="form-group"><label class="form-label">XP Deduction</label><input type="number" id="pen-xp" placeholder="50" min="0" max="9999"></div>
+        <div class="form-group"><label class="form-label">Stat to Penalize</label>
+          <select id="pen-stat"><option value="">None</option><option value="knowledge">Knowledge</option><option value="strength">Strength</option><option value="endurance">Endurance</option><option value="wisdom">Wisdom</option><option value="focus">Focus</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Stat Points Lost</label><input type="number" id="pen-stat-pts" placeholder="5" min="0" max="999"></div>
+        <div class="form-group"><label class="form-label">Gold Lost</label><input type="number" id="pen-gold" placeholder="0" min="0" max="9999"></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-danger" onclick="applyCustomPenalty()">💀 Apply Now</button>
+        <button class="btn btn-sm" onclick="savePenaltyPreset()">📌 Save as Preset</button>
+      </div>
+    </div>
+
+    <!-- Penalty log -->
+    <div style="font-size:11px;font-family:'Orbitron',monospace;letter-spacing:1px;color:var(--text-muted);margin-bottom:8px">PENALTY LOG</div>
+    <div id="penalty-log-list"></div>
+  </div>
+
+  <!-- PLAYTIME CONFIG -->
+  <div class="edit-section">
+    <div class="edit-section-title">🎮 Playtime Settings</div>
+    <p class="section-sub">Earn screen time by accumulating XP. A pill appears in the header when unlocked.</p>
+    <div class="playtime-config-row">
+      <label>XP to earn playtime:</label>
+      <input type="number" id="pt-xp-input" min="100" max="9999" step="50" style="max-width:110px">
+      <label>Minutes earned:</label>
+      <input type="number" id="pt-min-input" min="5" max="180" step="5" style="max-width:90px">
+      <button class="btn btn-green" onclick="savePlaytimeConfig()">💾 Save</button>
+    </div>
+    <div id="pt-feedback" style="margin-top:10px;font-size:12px;color:var(--text-muted)"></div>
+  </div>
+
+  <!-- EDIT ACHIEVEMENTS -->
+  <div class="edit-section">
+    <div class="edit-section-title">🏆 Edit Achievements</div>
+    <p class="section-sub">Customize icons, titles, descriptions, and story text. Use <code style="color:var(--accent-cyan);background:var(--bg-raised);padding:1px 6px;border-radius:3px">{name}</code> to insert the player's name in the story.</p>
+    <div class="ach-edit-list" id="achievement-editor"></div>
+    <button class="btn btn-primary btn-sm" onclick="saveAchievements()">💾 Save Achievements</button>
+  </div>
+
+  <!-- CUSTOM QUESTS -->
+  <div class="edit-section">
+    <div class="edit-section-title">Custom Quests</div>
+    <div class="edit-list" id="custom-quests-list"></div>
+    <div class="card" style="padding:14px">
+      <div class="card-title">Add New Quest</div>
+      <div class="add-form-grid">
+        <div class="form-group"><label class="form-label">Icon (emoji)</label><input type="text" id="cq-icon" placeholder="🎯" maxlength="4" style="text-align:center;font-size:18px"></div>
+        <div class="form-group"><label class="form-label">Quest Title</label><input type="text" id="cq-title" placeholder="e.g. Study for 1 hour"></div>
+        <div class="form-group"><label class="form-label">XP Reward</label><input type="number" id="cq-xp" placeholder="50" min="5" max="999"></div>
+        <div class="form-group"><label class="form-label">Gold Reward</label><input type="number" id="cq-gold" placeholder="10" min="1" max="500"></div>
+        <div class="form-group"><label class="form-label">Stat Affected</label><select id="cq-stat"><option value="knowledge">Knowledge</option><option value="strength">Strength</option><option value="endurance">Endurance</option><option value="wisdom">Wisdom</option><option value="focus">Focus</option></select></div>
+      </div>
+      <button class="btn btn-primary" onclick="addCustomQuest()">➕ Add Quest</button>
+    </div>
+  </div>
+
+
+  <!-- WORLD MAP EDITOR -->
+  <div class="edit-section" id="edit-world-section">
+    <div class="edit-section-title">🗺️ World Map Editor</div>
+    <p class="section-sub">Create worlds and add stages to them. Each stage is a node on the map. Stages unlock sequentially — complete one to unlock the next. Use <code style="color:var(--accent-cyan);background:var(--bg-raised);padding:1px 5px;border-radius:3px">{name}</code> in story text for the player's name.</p>
+
+    <!-- Existing worlds list -->
+    <div id="world-editor-list" style="margin-bottom:16px"></div>
+
+    <!-- Add new world form -->
+    <div class="add-world-form">
+      <div class="add-world-title">🌍 Add New World</div>
+      <div class="add-form-grid" style="margin-bottom:10px">
+        <div class="form-group"><label class="form-label">World Icon (emoji)</label><input type="text" id="nw-icon" placeholder="🌍" maxlength="4" style="text-align:center;font-size:20px"></div>
+        <div class="form-group"><label class="form-label">World Name</label><input type="text" id="nw-name" placeholder="e.g. The Scholar's Realm"></div>
+        <div class="form-group"><label class="form-label">World Color (hex)</label><input type="text" id="nw-color" placeholder="#7B61FF" maxlength="7"></div>
+        <div class="form-group"><label class="form-label">Background Theme</label>
+          <select id="nw-bg"><option value="forest">🌲 Forest</option><option value="desert">🏜️ Desert</option><option value="ocean">🌊 Ocean</option><option value="mountain">⛰️ Mountain</option><option value="space">🌌 Space</option><option value="volcano">🌋 Volcano</option><option value="snow">❄️ Snow</option><option value="cyber">💻 Cyber</option></select>
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addNewWorld()">🌍 Create World</button>
+    </div>
+
+    <!-- Add stage to world form -->
+    <div class="add-stage-form">
+      <div class="add-world-title" style="margin-bottom:10px">⭐ Add Stage to World</div>
+      <div class="add-form-grid" style="margin-bottom:10px">
+        <div class="form-group"><label class="form-label">Target World</label><select id="ns-world-select" style="font-size:12px"></select></div>
+        <div class="form-group"><label class="form-label">Stage Icon</label><input type="text" id="ns-icon" placeholder="⭐" maxlength="4" style="text-align:center;font-size:18px"></div>
+        <div class="form-group"><label class="form-label">Stage Name</label><input type="text" id="ns-name" placeholder="e.g. The First Trial"></div>
+        <div class="form-group"><label class="form-label">Stage Type</label>
+          <select id="ns-type"><option value="quest">Quest</option><option value="boss">Boss Battle</option><option value="milestone">Milestone</option><option value="lore">Lore</option></select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:10px"><label class="form-label">Story Text (shown when stage is tapped)</label>
+        <textarea id="ns-story" placeholder="Describe what happens when the hero reaches this stage... use {name} for the player's name." style="min-height:70px"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="addStageToWorld()">⭐ Add Stage</button>
+    </div>
+  </div>
+
+  <!-- TODAY'S QUEST PICKER -->
+  <div class="edit-section">
+    <div class="edit-section-title">Today's Active Quests</div>
+    <p class="section-sub">Manually choose which quests appear today.</p>
+    <div id="today-quest-picker"></div>
+    <button class="btn btn-primary mt-8" onclick="saveQuestPicker()">💾 Set Today's Quests</button>
+  </div>
+
+  <!-- DANGER ZONE -->
+  <div class="edit-section">
+    <div class="edit-section-title">Danger Zone</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <span class="text-muted">Permanently delete all progress and start fresh.</span>
+      <button class="btn btn-danger" onclick="resetProgress()">🗑️ Reset All Progress</button>
+    </div>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section class="panel" id="panel-profile">
+  <h2 class="section-head">Character</h2>
+  <div class="character-layout">
+    <div class="card avatar-card">
+      <!-- Avatar -->
+      <div class="avatar-outer">
+        <div class="avatar-glow"></div>
+        <img id="avatar-photo" class="avatar-photo" src="" alt="Avatar">
+        <div class="avatar-svg-wrap" id="avatar-svg-wrap">
+          <svg id="avatar-svg" class="avatar-svg" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+        <!-- Hover overlay for upload -->
+        <div class="avatar-upload-zone" onclick="document.getElementById('avatar-file-input').click()">
+          <div class="upload-hover-label"><span class="upload-icon">📷</span>Upload Photo</div>
+        </div>
+        <input type="file" id="avatar-file-input" accept="image/*" onchange="handleAvatarUpload(event)">
+      </div>
+      <!-- Upload strip -->
+      <div class="avatar-upload-strip">
+        <button class="btn btn-sm btn-gold" onclick="document.getElementById('avatar-file-input').click()">📷 Upload Photo</button>
+        <button class="btn btn-sm btn-danger" id="remove-photo-btn" style="display:none" onclick="removeAvatarPhoto()">✕ Remove</button>
+      </div>
+      <div style="text-align:center">
+        <div class="player-name" id="player-name-display" onclick="focusNameInput()">Player</div>
+        <div class="player-title" id="player-title-display">Novice</div>
+      </div>
+      <div class="level-badge" id="profile-level-badge">1</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Attribute Rings</div>
+      <div class="stats-grid" id="stats-rings-wrap"></div>
+    </div>
+  </div>
+  <div class="card mt-16">
+    <div class="card-title">Settings</div>
+    <div style="max-width:480px">
+      <div class="settings-row">
+        <span class="text-muted">Player Name</span>
+        <div style="display:flex;gap:8px;flex:1;max-width:240px">
+          <input type="text" id="name-input" placeholder="Enter name">
+          <button class="btn btn-primary" onclick="saveName()" style="flex-shrink:0">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<nav id="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mobile-nav-btn active" data-tab="quests"><span class="mnav-icon">⚔️</span>Quests</button>
+    <button class="mobile-nav-btn" data-tab="story"><span class="mnav-icon">📖</span>Story</button>
+    <button class="mobile-nav-btn" data-tab="achievements"><span class="mnav-icon">🏆</span>Awards</button>
+    <button class="mobile-nav-btn" data-tab="stats"><span class="mnav-icon">📊</span>Stats</button>
+    <button class="mobile-nav-btn" data-tab="edit"><span class="mnav-icon">✏️</span>Edit</button>
+    <button class="mobile-nav-btn" data-tab="profile"><span class="mnav-icon">👤</span>Profile</button>
+  </div>
+</nav>
+
+<!-- LEVEL UP OVERLAY -->
+<div id="levelup-overlay" onclick="dismissLevelUp()">
+  <div class="lvl-bg"></div>
+  <div class="lvl-ring"></div>
+  <div class="lvl-ring"></div>
+  <div class="lvl-ring"></div>
+  <div class="lvl-rays" id="lvl-rays"></div>
+  <div class="lvl-content">
+    <div class="lvl-label">Level Up!</div>
+    <span class="lvl-number" id="lvl-number">2</span>
+    <div class="lvl-title" id="lvl-title">Scholar</div>
+    <div class="lvl-hint">Tap to continue</div>
+  </div>
+</div>
+<div class="confetti-wrap" id="confetti-wrap"></div>
+
+<!-- ACHIEVEMENT POPUP -->
+<div id="ach-popup">
+  <div class="ach-popup-inner">
+    <div class="ach-popup-icon" id="ach-popup-icon">🏆</div>
+    <div class="ach-popup-body">
+      <div class="ach-popup-tag">Achievement Unlocked</div>
+      <div class="ach-popup-name" id="ach-popup-name">First Quest</div>
+      <div class="ach-popup-desc" id="ach-popup-desc">Complete your first quest</div>
+    </div>
+  </div>
+</div>
+
+<!-- LOOT MODAL -->
+<div id="loot-modal"><div class="loot-modal-inner"><span class="loot-icon" id="loot-icon">🎁</span><div class="loot-rarity" id="loot-rarity">COMMON</div><div class="loot-label" id="loot-label">Reward!</div><button class="btn btn-primary" style="width:100%" onclick="closeLoot()">Claim!</button></div></div>
+
+<!-- FLEE / VICTORY -->
+<div id="flee-flash"></div>
+<div id="victory-flash"></div>
+<div id="penalty-flash"></div>
+
+<!-- PLAYTIME MODAL -->
+<div id="playtime-modal">
+  <div class="playtime-modal-inner">
+    <span class="pt-trophy">🎮</span>
+    <div class="pt-title">PLAYTIME UNLOCKED!</div>
+    <div class="pt-sub">You earned this break. Enjoy every second of it!</div>
+    <div class="pt-timer" id="pt-timer-display">30:00</div>
+    <div style="margin:12px 0">
+      <div class="pt-bar-track"><div class="pt-bar-fill" id="pt-bar-fill" style="width:100%"></div></div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px" id="pt-xp-label">XP towards next playtime: 0 / 500</div>
+    </div>
+    <div class="pt-acts">
+      <div class="pt-act"><span class="pt-act-icon">🎮</span><span class="pt-act-label">Gaming</span></div>
+      <div class="pt-act"><span class="pt-act-icon">🎵</span><span class="pt-act-label">Music</span></div>
+      <div class="pt-act"><span class="pt-act-icon">📺</span><span class="pt-act-label">Videos</span></div>
+      <div class="pt-act"><span class="pt-act-icon">🕹️</span><span class="pt-act-label">Fun</span></div>
+      <div class="pt-act"><span class="pt-act-icon">📱</span><span class="pt-act-label">Social</span></div>
+      <div class="pt-act"><span class="pt-act-icon">😴</span><span class="pt-act-label">Rest</span></div>
+    </div>
+    <button class="btn btn-green" style="width:100%;margin-top:8px" onclick="closePlaytime()">Done — Back to Work 💪</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   EDITABLE CONFIG
+   ============================================================ */
+const CONFIG = {
+  playerName:"Pavan", appName:"LifeForge RPG", xpPerLevel:1000, startingShields:3,
+  playtimeXpThreshold:500, playtimeMinutes:30,
+  statPerTier:10,   /* Points needed per stat tier. 10 tiers = max 100 pts shown */
+
+  /* Default penalty presets */
+  defaultPenalties:[
+    {id:'p1',icon:'😴',name:'Skipped Workout',   xpLoss:80,  stat:'strength', statLoss:5, goldLoss:10},
+    {id:'p2',icon:'📵',name:'Missed Study Day',   xpLoss:100, stat:'knowledge',statLoss:6, goldLoss:15},
+    {id:'p3',icon:'🍔',name:'Junk Food Binge',    xpLoss:40,  stat:'endurance',statLoss:3, goldLoss:5},
+    {id:'p4',icon:'🌙',name:'Stayed Up Late',     xpLoss:50,  stat:'focus',    statLoss:4, goldLoss:8},
+    {id:'p5',icon:'📖',name:'Skipped Reading',    xpLoss:30,  stat:'wisdom',   statLoss:3, goldLoss:5},
+    {id:'p6',icon:'💤',name:'Lazy Day (No quests)',xpLoss:120, stat:'',         statLoss:0, goldLoss:20},
+  ],
+  statKeys:["knowledge","strength","endurance","wisdom","focus"],
+  defaultStatNames:{knowledge:"Knowledge",strength:"Strength",endurance:"Endurance",wisdom:"Wisdom",focus:"Focus"},
+  statColors:{knowledge:"#00E5FF",strength:"#FF4757",endurance:"#F5A623",wisdom:"#7B61FF",focus:"#4ade80"},
+  questPool:[
+    {id:1,title:"Study History 30 mins",xp:70,gold:10,stat:"knowledge",icon:"📚"},
+    {id:2,title:"Jog 15 minutes",xp:50,gold:8,stat:"endurance",icon:"🏃"},
+    {id:3,title:"Read 10 pages",xp:30,gold:5,stat:"wisdom",icon:"📖"},
+    {id:4,title:"Meditate 10 mins",xp:40,gold:7,stat:"focus",icon:"🧘"},
+    {id:5,title:"Gym session",xp:100,gold:15,stat:"strength",icon:"💪"},
+    {id:6,title:"Solve 10 Math problems",xp:80,gold:12,stat:"knowledge",icon:"🔢"},
+    {id:7,title:"Practice Mindfulness",xp:35,gold:6,stat:"focus",icon:"🌿"},
+    {id:8,title:"Push-ups 3 sets",xp:45,gold:8,stat:"strength",icon:"🏋️"},
+  ],
+  bossPool:[
+    {id:1,name:"East India Company Arc",hp:100,duration:25,xp:200,icon:"⚔️"},
+    {id:2,name:"SSC Mock Test",hp:100,duration:30,xp:250,icon:"📝"},
+    {id:3,name:"Cardio Dungeon",hp:100,duration:20,xp:180,icon:"🏋️"},
+  ],
+  lootPool:[
+    {type:"xp",value:50,label:"+50 Bonus XP",rarity:"common"},
+    {type:"xp",value:150,label:"+150 Power XP",rarity:"rare"},
+    {type:"gold",value:100,label:"+100 Gold Coins",rarity:"common"},
+    {type:"badge",value:"🌟",label:"Star Explorer Badge",rarity:"epic"},
+    {type:"shield",value:1,label:"Shield Token +1",rarity:"uncommon"},
+    {type:"xp",value:75,label:"+75 Scholar XP",rarity:"uncommon"},
+  ],
+  skillUnlockThresholds:[20,40,60,80],
+  skillTrees:{
+    Scholar:{stat:"knowledge",nodes:[{icon:"📖",label:"Reader",tip:"Knowledge ≥ 20"},{icon:"🔬",label:"Researcher",tip:"Knowledge ≥ 40"},{icon:"🧠",label:"Scholar",tip:"Knowledge ≥ 60"},{icon:"🎓",label:"Sage",tip:"Knowledge ≥ 80"}]},
+    Warrior:{stat:"strength",nodes:[{icon:"🥊",label:"Brawler",tip:"Strength ≥ 20"},{icon:"⚔️",label:"Fighter",tip:"Strength ≥ 40"},{icon:"🛡️",label:"Champion",tip:"Strength ≥ 60"},{icon:"👑",label:"Legend",tip:"Strength ≥ 80"}]},
+    Sage:{stat:"focus",nodes:[{icon:"🌱",label:"Seeker",tip:"Focus ≥ 20"},{icon:"🔮",label:"Mystic",tip:"Focus ≥ 40"},{icon:"✨",label:"Adept",tip:"Focus ≥ 60"},{icon:"🌟",label:"Archsage",tip:"Focus ≥ 80"}]},
+  },
+  achievements:[
+    {id:"first_quest",icon:"🏆",title:"First Quest",desc:"Complete your first quest",story:"The gates of destiny opened. {name} stepped forth and completed the very first quest, marking the dawn of a legend."},
+    {id:"scholar_init",icon:"📚",title:"Scholar Initiate",desc:"Knowledge reaches 10",story:"The mind of {name} began to awaken. Pages turned, lessons absorbed — the scholar's path had been chosen."},
+    {id:"boss_slayer",icon:"⚔️",title:"Boss Slayer",desc:"Defeat your first boss",story:"With iron will and unwavering focus, {name} stood before a mighty boss — and struck it down. The first of many victories."},
+    {id:"week_warrior",icon:"🔥",title:"Week Warrior",desc:"7-day streak achieved",story:"Seven sunrises. Seven days of discipline. {name} proved that consistency is the greatest power of all."},
+    {id:"century_club",icon:"💎",title:"Century Club",desc:"Earn 100 total XP",story:"A hundred experience points forged in sweat and dedication. {name} crossed the threshold — and there was no turning back."},
+    {id:"gold_hoarder",icon:"🪙",title:"Gold Hoarder",desc:"Accumulate 200 gold",story:"The coffers of {name} gleamed with 200 pieces of gold — each coin a testament to completed tasks and battles won."},
+    {id:"focused_mind",icon:"🧘",title:"Focused Mind",desc:"Focus stat reaches 20",story:"In silence, in stillness — {name} found the eye of the storm. The focused mind became an unbreakable weapon."},
+    {id:"endure",icon:"🏃",title:"Endurance Test",desc:"Endurance reaches 15",story:"Lungs burning, legs aching — yet {name} did not stop. Endurance was no longer a trait. It was an identity."},
+  ],
+  titles:[{min:1,max:4,label:"Novice"},{min:5,max:9,label:"Scholar"},{min:10,max:14,label:"Champion"},{min:15,max:999,label:"Legend"}],
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const SK = "lifeforge_v4";
+function defaultState(){return{
+  playerName:CONFIG.playerName,xp:0,gold:0,
+  stats:{knowledge:0,strength:0,endurance:0,wisdom:0,focus:0},
+  streak:0,lastLogin:null,shields:CONFIG.startingShields,
+  achievements:[],questsCompletedToday:[],todayQuests:[],
+  lastQuestRefresh:null,bossesDefeated:0,totalQuestsCompleted:0,
+  customQuests:[],customBosses:[],storyChapters:[],worldMap:null,
+  statPerTier:CONFIG.statPerTier,
+  penaltyPresets:null,  /* null = use CONFIG.defaultPenalties */
+  penaltyLog:[],        /* history of applied penalties */
+  playtimeXpThreshold:CONFIG.playtimeXpThreshold,
+  playtimeMinutes:CONFIG.playtimeMinutes,
+  xpSinceLastPlaytime:0,playtimeEarned:false,playtimeSecondsLeft:0,
+  xpPerLevel:CONFIG.xpPerLevel,
+  achievementDefs:null,statNames:{...CONFIG.defaultStatNames},avatarPhoto:null,
+};}
+
+let state = defaultState();
+function loadState(){
+  try{const s=localStorage.getItem(SK);if(s)state=Object.assign(defaultState(),JSON.parse(s));
+  if(!state.achievementDefs)state.achievementDefs=JSON.parse(JSON.stringify(CONFIG.achievements));
+  if(!state.statNames)state.statNames={...CONFIG.defaultStatNames};
+  if(!state.penaltyPresets)state.penaltyPresets=JSON.parse(JSON.stringify(CONFIG.defaultPenalties));
+  if(!state.penaltyLog)state.penaltyLog=[];
+  if(!state.statPerTier)state.statPerTier=CONFIG.statPerTier;
+  }catch(e){console.warn(e);}
+}
+function saveState(){try{localStorage.setItem(SK,JSON.stringify(state));}catch(e){}}
+
+/* ============================================================
+   EXPONENTIAL SCALING ENGINE
+   ============================================================
+
+   XP TO LEVEL UP (per level):
+     xpNeeded(lvl) = BASE_XP × SCALE_FACTOR^(lvl-1)
+     Default BASE_XP=200, SCALE=1.25
+     Lvl 1→2 : 200 XP   Lvl 5→6 : ~488 XP
+     Lvl 10→11: ~1490 XP  Lvl 20→21: ~17K XP
+
+   STAT POINTS TO ADVANCE (per tier):
+     ptsNeeded(tier) = BASE_STAT_PTS × STAT_SCALE^tier
+     Default BASE=5, SCALE=1.4
+     Tier 0→1: 5 pts    Tier 3→4: ~14 pts
+     Tier 7→8: ~59 pts   Tier 9→10: ~116 pts
+
+   Both BASE values and SCALE_FACTORs are user-editable.
+   ============================================================ */
+
+function getCfg(k,def){ return (state.scalingCfg&&state.scalingCfg[k]!=null)?state.scalingCfg[k]:def; }
+
+/* XP needed to complete level `lvl` (0-indexed internally, 1-indexed for display) */
+function xpForLevel(lvl){
+  const base=getCfg('xpBase',200);
+  const scale=getCfg('xpScale',1.25);
+  return Math.round(base * Math.pow(scale, lvl-1));
+}
+/* Total cumulative XP required to reach level `lvl` */
+function totalXpForLevel(lvl){
+  let total=0;for(let i=1;i<lvl;i++)total+=xpForLevel(i);return total;
+}
+/* Current level from total XP */
+function getLevel(){
+  let lvl=1;
+  while(state.xp>=totalXpForLevel(lvl+1))lvl++;
+  return lvl;
+}
+/* XP earned so far inside current level */
+function getXpInLevel(){
+  const lvl=getLevel();
+  return state.xp-totalXpForLevel(lvl);
+}
+/* XP needed for current level span */
+function getXpThisLevel(){
+  return xpForLevel(getLevel());
+}
+/* Progress % through current level */
+function getXpPct(){
+  return Math.min(100,(getXpInLevel()/getXpThisLevel())*100);
+}
+
+/* Stat: points needed to advance from current tier to next */
+function statPtsForTier(tier){
+  const base=getCfg('statBase',5);
+  const scale=getCfg('statScale',1.4);
+  return Math.round(base * Math.pow(scale, tier));
+}
+/* Total raw points needed to be at start of `tier` */
+function totalStatPtsForTier(tier){
+  let t=0;for(let i=0;i<tier;i++)t+=statPtsForTier(i);return t;
+}
+/* Which tier (0-9) the stat is in */
+function getStatTier(statVal){
+  let tier=0;
+  while(tier<9 && statVal>=totalStatPtsForTier(tier+1))tier++;
+  return tier;
+}
+/* Progress % within current stat tier */
+function getStatTierPct(statVal){
+  const tier=getStatTier(statVal);
+  const start=totalStatPtsForTier(tier);
+  const need=statPtsForTier(tier);
+  return Math.min(100,((statVal-start)/need)*100);
+}
+/* Total raw pts that constitute "max stat" (tier 10 ceiling) */
+function getStatMax(){
+  return totalStatPtsForTier(10);
+}
+/* Display value: 0–100 normalized for rings/bars */
+function getStatDisplay(statVal){
+  return Math.min(100,(statVal/getStatMax())*100);
+}
+
+/* Apply gain with exponential DR: higher tier = much less effective */
+function applyStatGain(key, rawGain){
+  const cur=state.stats[key]||0;
+  const max=getStatMax();
+  if(cur>=max)return 0;
+  const tier=getStatTier(cur);
+  /* DR: tier 0 = 100%, tier 4 = ~30%, tier 9 = ~5% */
+  const dr=Math.max(0.05, Math.pow(0.7, tier));
+  const effective=Math.max(0.1, rawGain*dr);
+  state.stats[key]=Math.min(max, cur+effective);
+  return effective;
+}
+
+/* Stat loss clamped at 0 */
+function applyStatLoss(key, pts){
+  if(!key||pts<=0)return;
+  state.stats[key]=Math.max(0,(state.stats[key]||0)-pts);
+}
+
+/* ============================================================
+   HELPERS
+   ============================================================ */
+function getTitle(lvl){return(CONFIG.titles.find(t=>lvl>=t.min&&lvl<=t.max)||{label:"Legend"}).label;}
+function getSN(k){return(state.statNames&&state.statNames[k])||CONFIG.defaultStatNames[k]||k;}
+function getAllQuests(){return[...CONFIG.questPool,...(state.customQuests||[])];}
+function getAllBosses(){return[...CONFIG.bossPool,...(state.customBosses||[])];}
+function getAchs(){return state.achievementDefs||CONFIG.achievements;}
+function getPenaltyPresets(){return state.penaltyPresets||CONFIG.defaultPenalties;}
+
+/* ============================================================
+   STREAK
+   ============================================================ */
+function checkStreak(){
+  const today=new Date().toDateString();
+  if(!state.lastLogin){state.streak=1;state.lastLogin=today;return;}
+  if(state.lastLogin===today)return;
+  const diff=Math.floor((new Date()-new Date(state.lastLogin))/86400000);
+  if(diff===1){state.streak++;}else{const use=Math.min(diff-1,state.shields);state.shields-=use;if(diff-1>use)state.streak=0;}
+  state.lastLogin=today;
+}
+
+/* ============================================================
+   TODAY QUESTS
+   ============================================================ */
+function ensureTodayQuests(){
+  const today=new Date().toDateString();
+  if(state.lastQuestRefresh!==today||!state.todayQuests||state.todayQuests.length===0){
+    state.todayQuests=[...getAllQuests()].sort(()=>Math.random()-0.5).slice(0,5).map(q=>q.id);
+    state.questsCompletedToday=[];state.lastQuestRefresh=today;
+  }
+}
+function refreshQuests(){
+  state.todayQuests=[...getAllQuests()].sort(()=>Math.random()-0.5).slice(0,5).map(q=>q.id);
+  state.questsCompletedToday=[];state.lastQuestRefresh=new Date().toDateString();
+  saveState();renderQuests();showToast("New quests loaded! 🎲");
+}
+
+/* ============================================================
+   XP / GOLD
+   ============================================================ */
+function gainXP(amount){
+  const prev=getLevel();state.xp=Math.max(0,state.xp+amount);const curr=getLevel();
+  checkPlaytimeUnlock(amount);saveState();updateHeader();showToast(`+${amount} XP ✨`);
+  if(curr>prev)triggerLevelUp(curr);
+  checkAchievements();renderStatBars();renderDashboard();
+}
+function gainGold(amount){state.gold+=amount;saveState();updateHeader();}
+
+/* ============================================================
+   QUEST COMPLETE — exponential DR stat gain
+   ============================================================ */
+function completeQuest(id){
+  if(state.questsCompletedToday.includes(id))return;
+  const q=getAllQuests().find(q=>q.id===id);if(!q)return;
+  state.questsCompletedToday.push(id);state.totalQuestsCompleted++;
+  const gained=applyStatGain(q.stat, q.xp/10);
+  if(gained>0)showStatToast(q.stat,gained,true);
+  gainXP(q.xp);gainGold(q.gold);
+  saveState();renderQuests();renderStatRings();renderSkillTree();checkAchievements();
+}
+
+/* ============================================================
+   PENALTIES
+   ============================================================ */
+function showStatToast(statKey, pts, isGain){
+  const sn=getSN(statKey);const sign=isGain?'+':'-';
+  const t=document.createElement('div');
+  t.className='xp-toast'+(isGain?'':' penalty-toast');
+  t.textContent=`${sign}${pts.toFixed(1)} ${sn}`;
+  t.style.top='110px';
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2200);
+}
+
+function applyPenalty(pen, saveAndRender=true){
+  /* XP loss — never below 0 */
+  if(pen.xpLoss>0){
+    state.xp=Math.max(0,state.xp-pen.xpLoss);
+  }
+  /* Stat loss */
+  if(pen.stat&&pen.statLoss>0) applyStatLoss(pen.stat,pen.statLoss);
+  /* Gold loss */
+  if(pen.goldLoss>0) state.gold=Math.max(0,state.gold-(pen.goldLoss||0));
+
+  /* Log it */
+  if(!state.penaltyLog)state.penaltyLog=[];
+  state.penaltyLog.unshift({
+    icon:pen.icon||'💀', name:pen.name,
+    xpLoss:pen.xpLoss||0, stat:pen.stat||'', statLoss:pen.statLoss||0, goldLoss:pen.goldLoss||0,
+    date:new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+    time:new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})
+  });
+  /* Keep last 30 */
+  state.penaltyLog=state.penaltyLog.slice(0,30);
+
+  if(saveAndRender){
+    saveState();updateHeader();renderStatBars();renderStatRings();renderDashboard();
+    renderPenaltyLog();
+    /* Red flash */
+    const pf=document.getElementById('penalty-flash');
+    if(pf){pf.classList.add('show');setTimeout(()=>pf.classList.remove('show'),900);}
+    /* Toast summary */
+    let msg=`💀 ${pen.name}: `;
+    const parts=[];
+    if(pen.xpLoss>0)parts.push(`-${pen.xpLoss}XP`);
+    if(pen.stat&&pen.statLoss>0)parts.push(`-${pen.statLoss} ${getSN(pen.stat)}`);
+    if(pen.goldLoss>0)parts.push(`-${pen.goldLoss}🪙`);
+    showPenaltyToast(msg+parts.join(' · '));
+  }
+}
+
+function showPenaltyToast(text){
+  const t=document.createElement('div');t.className='xp-toast penalty-toast';t.textContent=text;
+  t.style.top='110px';document.body.appendChild(t);setTimeout(()=>t.remove(),2500);
+}
+
+function applyCustomPenalty(){
+  const icon=document.getElementById('pen-icon').value.trim()||'💀';
+  const name=document.getElementById('pen-name').value.trim()||'Custom Penalty';
+  const xpLoss=parseInt(document.getElementById('pen-xp').value)||0;
+  const stat=document.getElementById('pen-stat').value||'';
+  const statLoss=parseInt(document.getElementById('pen-stat-pts').value)||0;
+  const goldLoss=parseInt(document.getElementById('pen-gold').value)||0;
+  if(xpLoss===0&&statLoss===0&&goldLoss===0){alert('Set at least one deduction value.');return;}
+  applyPenalty({icon,name,xpLoss,stat,statLoss,goldLoss});
+  ['pen-icon','pen-name','pen-xp','pen-stat-pts','pen-gold'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('pen-stat').value='';
+}
+
+function savePenaltyPreset(){
+  const icon=document.getElementById('pen-icon').value.trim()||'💀';
+  const name=document.getElementById('pen-name').value.trim();
+  const xpLoss=parseInt(document.getElementById('pen-xp').value)||0;
+  const stat=document.getElementById('pen-stat').value||'';
+  const statLoss=parseInt(document.getElementById('pen-stat-pts').value)||0;
+  const goldLoss=parseInt(document.getElementById('pen-gold').value)||0;
+  if(!name){alert('Give the preset a name.');return;}
+  if(!state.penaltyPresets)state.penaltyPresets=[];
+  state.penaltyPresets.push({id:'pc'+Date.now(),icon,name,xpLoss,stat,statLoss,goldLoss,custom:true});
+  saveState();renderPenaltyPresets();showToast('Penalty preset saved! 📌');
+  ['pen-icon','pen-name','pen-xp','pen-stat-pts','pen-gold'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('pen-stat').value='';
+}
+
+function removePenaltyPreset(id){
+  state.penaltyPresets=(state.penaltyPresets||[]).filter(p=>p.id!==id);
+  saveState();renderPenaltyPresets();
+}
+
+function renderPenaltyPresets(){
+  const wrap=document.getElementById('penalty-presets-list');if(!wrap)return;
+  const presets=getPenaltyPresets();
+  if(!presets||presets.length===0){wrap.innerHTML='<div class="text-muted" style="padding:8px">No presets yet. Add one above.</div>';return;}
+  wrap.innerHTML=presets.map(p=>{
+    const parts=[];
+    if(p.xpLoss>0)parts.push(`-${p.xpLoss}XP`);
+    if(p.stat&&p.statLoss>0)parts.push(`-${p.statLoss} ${getSN(p.stat)}`);
+    if(p.goldLoss>0)parts.push(`-${p.goldLoss}🪙`);
+    return`<div class="penalty-preset-item">
+      <span class="pen-icon">${p.icon}</span>
+      <div class="pen-info">
+        <div class="pen-name">${p.name}</div>
+        <div class="pen-desc">${parts.join(' · ')||'No deduction set'}</div>
+      </div>
+      <button class="pen-apply-btn" onclick="applyPenalty(getPenaltyPresets().find(x=>x.id==='${p.id}'))">Apply</button>
+      ${p.custom?`<button class="edit-item-remove" onclick="removePenaltyPreset('${p.id}')">✕</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderPenaltyLog(){
+  const wrap=document.getElementById('penalty-log-list');if(!wrap)return;
+  const log=state.penaltyLog||[];
+  if(log.length===0){wrap.innerHTML='<div class="text-muted" style="padding:8px">No penalties applied yet. Stay disciplined!</div>';return;}
+  wrap.innerHTML=log.map(p=>{
+    const parts=[];
+    if(p.xpLoss>0)parts.push(`-${p.xpLoss}XP`);
+    if(p.stat&&p.statLoss>0)parts.push(`-${p.statLoss} ${getSN(p.stat)}`);
+    if(p.goldLoss>0)parts.push(`-${p.goldLoss}🪙`);
+    return`<div class="penalty-log-item">
+      <span class="plog-icon">${p.icon}</span>
+      <span class="plog-name">${p.name}</span>
+      <span class="plog-effect">${parts.join(' ')}</span>
+      <span class="plog-date">${p.date} ${p.time}</span>
+    </div>`;
+  }).join('');
+}
+
+/* Stat tier preview for Edit Mode */
+function renderStatTierPreview(){
+  const wrap=document.getElementById('stat-tier-preview');if(!wrap)return;
+  const pt=getStatPerTier(),max=pt*10;
+  wrap.innerHTML=CONFIG.statKeys.map(k=>{
+    const val=state.stats[k]||0,pct=(val/max)*100;
+    const tier=getStatTier(val);
+    const dr=Math.max(10,Math.round((1-tier*0.1)*100));
+    const col=CONFIG.statColors[k]||'#00E5FF';
+    return`<div class="stat-tier-row">
+      <div class="stat-tier-label" style="color:${col}">${getSN(k)}</div>
+      <div class="stat-tier-track"><div class="stat-tier-fill" style="width:${pct}%;background:linear-gradient(90deg,${col}88,${col})"></div></div>
+      <div class="stat-tier-val">${val.toFixed(1)}/${max} · Tier ${tier+1}/10 · DR ${dr}%</div>
+    </div>`;
+  }).join('');
+}
+
+/* ============================================================
+   STAT PER TIER SAVE
+   ============================================================ */
+function saveStatPerTier(){
+  const v=parseInt(document.getElementById('stat-per-tier-input').value);
+  if(v>=5){state.statPerTier=v;saveState();
+    document.getElementById('current-spt').textContent=v;
+    document.getElementById('spt-feedback').textContent=`✓ Saved. Max stat = ${v*10} pts.`;
+    renderStatBars();renderStatRings();renderStatTierPreview();
+    showToast(`Stat threshold → ${v} pts/tier 📊`);}
+}
+
+/* ============================================================
+   CUSTOM QUESTS / BOSSES
+   ============================================================ */
+let cqSeq=1000,cbSeq=200;
+function addCustomQuest(){
+  const icon=document.getElementById('cq-icon').value.trim()||'🎯';
+  const title=document.getElementById('cq-title').value.trim();
+  const xp=parseInt(document.getElementById('cq-xp').value)||50;
+  const gold=parseInt(document.getElementById('cq-gold').value)||10;
+  const stat=document.getElementById('cq-stat').value;
+  if(!title){alert('Quest title is required.');return;}
+  state.customQuests.push({id:++cqSeq,title,xp,gold,stat,icon,custom:true});
+  saveState();['cq-icon','cq-title','cq-xp','cq-gold'].forEach(i=>document.getElementById(i).value='');
+  renderEditLists();renderTodayPicker();showToast('Quest added! ✅');
+}
+function removeCustomQuest(id){
+  state.customQuests=state.customQuests.filter(q=>q.id!==id);
+  state.todayQuests=state.todayQuests.filter(qid=>qid!==id);
+  saveState();renderEditLists();renderQuests();renderTodayPicker();
+}
+
+
+/* ============================================================
+   SCALING CONFIG SAVE
+   ============================================================ */
+function saveScalingCfg(){
+  const xpBase=parseInt(document.getElementById('cfg-xp-base').value);
+  const xpScale=parseFloat(document.getElementById('cfg-xp-scale').value);
+  const statBase=parseInt(document.getElementById('cfg-stat-base').value);
+  const statScale=parseFloat(document.getElementById('cfg-stat-scale').value);
+  if(!state.scalingCfg)state.scalingCfg={};
+  if(xpBase>=50)  state.scalingCfg.xpBase=xpBase;
+  if(xpScale>=1.0)state.scalingCfg.xpScale=xpScale;
+  if(statBase>=1) state.scalingCfg.statBase=statBase;
+  if(statScale>=1.0)state.scalingCfg.statScale=statScale;
+  saveState();updateHeader();renderDashboard();renderStatBars();renderStatRings();
+  renderScalingPreview();
+  showToast('Scaling config saved! ⚡');
+}
+
+function resetScalingCfg(){
+  state.scalingCfg={xpBase:200,xpScale:1.25,statBase:5,statScale:1.4};
+  saveState();populateScalingInputs();renderScalingPreview();updateHeader();renderDashboard();
+  showToast('Scaling reset to defaults');
+}
+
+function populateScalingInputs(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set('cfg-xp-base',   getCfg('xpBase',200));
+  set('cfg-xp-scale',  getCfg('xpScale',1.25));
+  set('cfg-stat-base', getCfg('statBase',5));
+  set('cfg-stat-scale',getCfg('statScale',1.4));
+}
+
+function renderScalingPreview(){
+  const xpEl=document.getElementById('scaling-xp-preview');
+  const stEl=document.getElementById('scaling-stat-preview');
+  if(xpEl){
+    const rows=[1,2,3,5,10,15,20].map(lvl=>{
+      const xp=xpForLevel(lvl);
+      const total=totalXpForLevel(lvl).toLocaleString();
+      return`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border-dim);font-size:11px">
+        <span style="color:var(--text-muted)">Level ${lvl}→${lvl+1}</span>
+        <span style="color:var(--accent-cyan);font-family:'JetBrains Mono',monospace">${xp.toLocaleString()} XP needed</span>
+        <span style="color:var(--text-muted);font-family:'JetBrains Mono',monospace">Total: ${total}</span>
+      </div>`;
+    }).join('');
+    xpEl.innerHTML=rows;
+  }
+  if(stEl){
+    const rows=[0,1,2,3,4,5,6,7,8,9].map(tier=>{
+      const need=statPtsForTier(tier);
+      const dr=Math.max(5,Math.round(Math.pow(0.7,tier)*100));
+      return`<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border-dim);font-size:11px">
+        <span style="color:var(--text-muted)">Tier ${tier+1}</span>
+        <span style="color:var(--accent-gold);font-family:'JetBrains Mono',monospace">${need} pts to pass</span>
+        <span style="color:${dr>60?'var(--accent-green)':dr>30?'var(--accent-gold)':'var(--accent-red)'};font-family:'JetBrains Mono',monospace">DR ${dr}%</span>
+      </div>`;
+    }).join('');
+    stEl.innerHTML=rows;
+  }
+}
+
+/* ============================================================
+   STAT NAMES
+   ============================================================ */
+function renderStatNameEditor(){
+  const wrap=document.getElementById('stat-name-editor');if(!wrap)return;
+  wrap.innerHTML=CONFIG.statKeys.map(k=>`
+    <div class="stat-name-item">
+      <span class="stat-name-label">${CONFIG.defaultStatNames[k]}</span>
+      <input type="text" id="sn-${k}" value="${getSN(k)}" placeholder="${CONFIG.defaultStatNames[k]}">
+    </div>`).join('');
+}
+function saveStatNames(){
+  CONFIG.statKeys.forEach(k=>{const el=document.getElementById('sn-'+k);if(el&&el.value.trim())state.statNames[k]=el.value.trim();});
+  saveState();renderStatBars();renderStatRings();renderDashboard();showToast('Stat names updated! 📊');
+}
+
+/* ============================================================
+   ACHIEVEMENT EDITOR
+   ============================================================ */
+function renderAchievementEditor(){
+  const wrap=document.getElementById('achievement-editor');if(!wrap)return;
+  const defs=getAchs();
+  wrap.innerHTML=defs.map((a,i)=>`
+    <div class="ach-edit-row">
+      <div class="ach-edit-top">
+        <input class="ach-edit-icon-input" type="text" id="ae-icon-${i}" value="${a.icon}" maxlength="4">
+        <input class="ach-edit-field" type="text" id="ae-title-${i}" value="${a.title}" placeholder="Title">
+        <input class="ach-edit-field" type="text" id="ae-desc-${i}" value="${a.desc}" placeholder="Description">
+      </div>
+      <input class="ach-edit-story" type="text" id="ae-story-${i}" value="${a.story}" placeholder="Story sentence (use {name} for player name)">
+    </div>`).join('');
+}
+function saveAchievements(){
+  const defs=getAchs();
+  defs.forEach((a,i)=>{
+    const ic=document.getElementById('ae-icon-'+i)?.value.trim();
+    const ti=document.getElementById('ae-title-'+i)?.value.trim();
+    const de=document.getElementById('ae-desc-'+i)?.value.trim();
+    const st=document.getElementById('ae-story-'+i)?.value.trim();
+    if(ic)a.icon=ic;if(ti)a.title=ti;if(de)a.desc=de;if(st)a.story=st;
+  });
+  state.achievementDefs=defs;saveState();renderAchievements();showToast('Achievements saved! 🏆');
+}
+
+/* ============================================================
+   WORLD MAP ENGINE — replaces old Story Mode
+   ============================================================ */
+
+CONFIG.defaultWorlds=[
+  {id:'w1',name:"The Scholar's Realm",icon:'📚',color:'#00E5FF',bg:'forest',stages:[
+    {id:'w1s1',name:'The First Page',icon:'📖',type:'quest',story:'{name} picked up the first book. The ink was still fresh — a story waiting to be written.'},
+    {id:'w1s2',name:'Seeds of Knowledge',icon:'🌱',type:'lore',story:'In the quiet library of the mind, {name} planted the first seeds. Each page turned, a root deeper.'},
+    {id:'w1s3',name:'The Study Hall',icon:'🏛️',type:'quest',story:'Hours passed like seconds. {name} sat in the great hall and let knowledge pour in like rain.'},
+    {id:'w1s4',name:"The Scholar's Test",icon:'📝',type:'boss',story:'The exam loomed. {name} took a breath and stepped into the battle of wits — and emerged victorious.'},
+    {id:'w1s5',name:'First Mastery',icon:'🎓',type:'milestone',story:"{name} closed the final chapter. The Scholar's Realm had been conquered. A new horizon awaited."},
+  ]},
+  {id:'w2',name:"The Warrior's Path",icon:'⚔️',color:'#FF4757',bg:'volcano',stages:[
+    {id:'w2s1',name:'Dawn Training',icon:'🌅',type:'quest',story:'Before the sun rose, {name} was already moving. Discipline is not found — it is built at dawn.'},
+    {id:'w2s2',name:'Iron Will',icon:'💪',type:'quest',story:'Every push-up was a promise. {name} made a pact with their body: no shortcuts, only strength.'},
+    {id:'w2s3',name:'The Arena',icon:'🏟️',type:'boss',story:'The arena fell silent as {name} stepped in. The crowd watched. The timer started. The battle began.'},
+    {id:'w2s4',name:'Beyond the Limit',icon:'🔥',type:'milestone',story:'{name} crossed the line they once thought was their ceiling. It was only the floor of what comes next.'},
+  ]},
+  {id:'w3',name:"The Sage's Silence",icon:'🧘',color:'#7B61FF',bg:'mountain',stages:[
+    {id:'w3s1',name:'First Breath',icon:'🌬️',type:'quest',story:'{name} sat still for the first time in weeks. In the silence, they heard something new — themselves.'},
+    {id:'w3s2',name:'The Mindful Mile',icon:'🌿',type:'quest',story:'Each step was intentional. {name} walked without a destination and arrived somewhere real.'},
+    {id:'w3s3',name:'Eye of the Storm',icon:'🔮',type:'lore',story:'The world was loud. But inside, {name} had found a pocket of stillness that nothing could touch.'},
+    {id:'w3s4',name:'Transcendence',icon:'✨',type:'milestone',story:'{name} had mastered the art of doing nothing — and in doing so, became capable of everything.'},
+  ]},
+];
+
+let wmCurrentWorldId=null,wmSelectedStageId=null,wmCanvas=null,wmCtx=null,wmAnimFrame=null;
+let wmPulseT=0,wmHoverStageId=null;
+
+const WM_THEMES={
+  forest:{sky:['#0d1f0d','#1a3a1a'],ground:'#0f2a10',path:'#2d5a2d'},
+  desert:{sky:['#1a1005','#2d1a08'],ground:'#2a1a08',path:'#5a3a10'},
+  ocean:{sky:['#050d1a','#0a1a2d'],ground:'#071525',path:'#0a2540'},
+  mountain:{sky:['#0a0a14','#14142a'],ground:'#121226',path:'#1e1e40'},
+  space:{sky:['#02020a','#050510'],ground:'#080818',path:'#0e0e28'},
+  volcano:{sky:['#1a0505','#2d0a08'],ground:'#1a0808',path:'#3d1010'},
+  snow:{sky:['#0a0f1a','#101830'],ground:'#0d1525',path:'#182040'},
+  cyber:{sky:['#030810','#060e1a'],ground:'#040c18',path:'#081424'},
+};
+const STAGE_TYPE_COLORS={quest:'#00E5FF',boss:'#FF4757',milestone:'#F5A623',lore:'#7B61FF'};
+
+function getWorldMap(){
+  if(!state.worldMap||!state.worldMap.worlds||!state.worldMap.worlds.length)
+    state.worldMap={worlds:JSON.parse(JSON.stringify(CONFIG.defaultWorlds)),completedStages:[],completedDates:{}};
+  if(!state.worldMap.completedDates)state.worldMap.completedDates={};
+  return state.worldMap;
+}
+function isStageCompleted(sid){return(getWorldMap().completedStages||[]).includes(sid);}
+function getStageStatus(world,idx){
+  if(isStageCompleted(world.stages[idx].id))return'completed';
+  if(idx===0)return'active';
+  return isStageCompleted(world.stages[idx-1].id)?'active':'locked';
+}
+
+function computeNodePositions(stages,W,H){
+  const cols=3,rowH=130,startY=80,padX=W*0.14,colW=(W-padX*2)/Math.max(cols-1,1);
+  return stages.map((s,i)=>{
+    const row=Math.floor(i/cols),colInRow=i%cols;
+    const col=(row%2===0)?colInRow:(cols-1-colInRow);
+    return{x:padX+col*colW+(i%2===0?1:-1)*8,y:startY+row*rowH+Math.sin(i*0.9)*18,stage:s,index:i};
+  });
+}
+
+function drawWorldMap(){
+  if(!wmCanvas||!wmCtx||!wmCurrentWorldId)return;
+  const W=wmCanvas.clientWidth,H=wmCanvas.clientHeight;
+  const ctx=wmCtx,wm=getWorldMap();
+  const world=wm.worlds.find(w=>w.id===wmCurrentWorldId);
+  if(!world)return;
+  const dpr=window.devicePixelRatio||1;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const theme=WM_THEMES[world.bg]||WM_THEMES.space;
+  const nodes=computeNodePositions(world.stages,W,H);
+  wmPulseT+=0.04;const pulse=0.5+0.5*Math.sin(wmPulseT);
+
+  /* Sky */
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,theme.sky[0]);grad.addColorStop(1,theme.sky[1]);
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+
+  /* Stars */
+  for(let i=0;i<50;i++){
+    const sx=((i*137+W*0.5)%W),sy=((i*97+H*0.3)%H);
+    ctx.globalAlpha=(0.1+0.2*(i%3===0?pulse:0.5));
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(sx,sy,0.7+i%2,0,Math.PI*2);ctx.fill();
+  }
+  ctx.globalAlpha=1;
+
+  /* Ground */
+  ctx.fillStyle=theme.ground;ctx.globalAlpha=0.45;
+  ctx.fillRect(0,H*0.87,W,H*0.13);ctx.globalAlpha=1;
+
+  /* Path lines */
+  for(let i=0;i<nodes.length-1;i++){
+    const a=nodes[i],b=nodes[i+1];
+    const sDone=getStageStatus(world,i)==='completed',bDone=getStageStatus(world,i+1)==='completed';
+    ctx.save();ctx.beginPath();
+    const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;
+    ctx.moveTo(a.x,a.y);ctx.quadraticCurveTo(mx+(a.y-b.y)*0.25,my+(b.x-a.x)*0.1,b.x,b.y);
+    ctx.lineWidth=sDone&&bDone?4:2;ctx.lineCap='round';
+    if(sDone&&bDone){ctx.strokeStyle=world.color||'#4ade80';ctx.shadowColor=world.color||'#4ade80';ctx.shadowBlur=6;}
+    else{ctx.strokeStyle='rgba(255,255,255,'+(sDone?'0.12':'0.05')+')';ctx.setLineDash([6,8]);}
+    ctx.stroke();ctx.restore();
+  }
+
+  /* Nodes */
+  nodes.forEach(({x,y,stage,index})=>{
+    const status=getStageStatus(world,index);
+    const isHov=wmHoverStageId===stage.id,isSel=wmSelectedStageId===stage.id;
+    const tc=STAGE_TYPE_COLORS[stage.type]||'#00E5FF';
+    const R=stage.type==='boss'?30:stage.type==='milestone'?27:22;
+    const isBoss=stage.type==='boss';
+    ctx.save();
+
+    /* Pulse ring for active */
+    if(status==='active'){
+      ctx.beginPath();ctx.arc(x,y,R+8+pulse*8,0,Math.PI*2);
+      ctx.strokeStyle=tc;ctx.lineWidth=1.5;ctx.globalAlpha=0.25*(1-pulse*0.4);ctx.stroke();ctx.globalAlpha=1;
+    }
+    /* Hover/select ring */
+    if(isHov||isSel){
+      ctx.beginPath();ctx.arc(x,y,R+5,0,Math.PI*2);
+      ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.globalAlpha=0.55;ctx.stroke();ctx.globalAlpha=1;
+    }
+    /* Boss dashes */
+    if(isBoss&&status!=='locked'){
+      ctx.beginPath();ctx.arc(x,y,R+4,0,Math.PI*2);
+      ctx.strokeStyle='#FF4757';ctx.lineWidth=2;ctx.setLineDash([4,4]);ctx.globalAlpha=0.7+0.3*pulse;
+      ctx.stroke();ctx.globalAlpha=1;ctx.setLineDash([]);
+    }
+    /* Circle */
+    const fillC=status==='completed'?'#1a3d1a':status==='active'?(isBoss?'#3d1515':'#1a2d3d'):'#111318';
+    const strokeC=status==='completed'?'#4ade80':status==='active'?tc:'#2a2d3a';
+    ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);
+    ctx.globalAlpha=status==='locked'?0.4:1;
+    ctx.fillStyle=fillC;ctx.fill();
+    ctx.strokeStyle=strokeC;ctx.lineWidth=status==='active'?2.5:1.5;ctx.stroke();
+    if(status==='completed'){ctx.fillStyle='rgba(74,222,128,0.12)';ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fill();}
+
+    /* Icon */
+    ctx.font=`${isBoss?18:15}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.globalAlpha=status==='locked'?0.25:1;
+    ctx.fillText(status==='locked'?'🔒':stage.icon,x,y);
+    if(status==='completed'){ctx.font='10px serif';ctx.fillText('✅',x+R*0.55,y+R*0.55);}
+    ctx.globalAlpha=1;
+
+    /* Label */
+    const ly=y+R+14;
+    ctx.font=`${status==='active'?'bold ':''}${isBoss?11:10}px Inter,sans-serif`;
+    ctx.textAlign='center';ctx.textBaseline='top';
+    ctx.fillStyle=status==='completed'?'#4ade80':status==='active'?tc:'#3a3f4a';
+    const words=stage.name.split(' ');
+    if(words.length<=2||stage.name.length<=12){ctx.fillText(stage.name,x,ly);}
+    else{const h=Math.ceil(words.length/2);ctx.fillText(words.slice(0,h).join(' '),x,ly);ctx.fillText(words.slice(h).join(' '),x,ly+13);}
+    ctx.restore();
+  });
+
+  /* Watermark */
+  ctx.save();ctx.font="11px Orbitron,monospace";ctx.textAlign='right';ctx.textBaseline='bottom';
+  ctx.fillStyle='rgba(255,255,255,0.05)';ctx.fillText(world.name.toUpperCase(),W-12,H-10);ctx.restore();
+
+  wmAnimFrame=requestAnimationFrame(drawWorldMap);
+}
+
+function stopWmAnimation(){if(wmAnimFrame){cancelAnimationFrame(wmAnimFrame);wmAnimFrame=null;}}
+
+function initWorldMapCanvas(){
+  wmCanvas=document.getElementById('worldmap-canvas');if(!wmCanvas)return;
+  wmCtx=wmCanvas.getContext('2d');resizeCanvas();
+  window.addEventListener('resize',resizeCanvas);
+  wmCanvas.addEventListener('mousemove',onCvMove);
+  wmCanvas.addEventListener('click',onCvClick);
+  wmCanvas.addEventListener('touchend',onCvTouch,{passive:true});
+  wmCanvas.addEventListener('mouseleave',()=>{wmHoverStageId=null;const t=document.getElementById('wm-tooltip');if(t)t.classList.remove('visible');});
+}
+
+function resizeCanvas(){
+  if(!wmCanvas)return;
+  const container=wmCanvas.parentElement;
+  const dpr=window.devicePixelRatio||1;
+  const W=container.clientWidth;
+  const H=Math.max(Math.min(W*0.62,500),300);
+  wmCanvas.width=W*dpr;wmCanvas.height=H*dpr;
+  wmCanvas.style.width=W+'px';wmCanvas.style.height=H+'px';
+}
+
+function getCvXY(e){
+  const rect=wmCanvas.getBoundingClientRect();
+  if(e.changedTouches)return{x:e.changedTouches[0].clientX-rect.left,y:e.changedTouches[0].clientY-rect.top};
+  return{x:e.clientX-rect.left,y:e.clientY-rect.top};
+}
+
+function hitTest(x,y){
+  if(!wmCurrentWorldId)return null;
+  const wm=getWorldMap(),world=wm.worlds.find(w=>w.id===wmCurrentWorldId);if(!world)return null;
+  const W=wmCanvas.clientWidth,H=wmCanvas.clientHeight;
+  const nodes=computeNodePositions(world.stages,W,H);
+  for(let i=nodes.length-1;i>=0;i--){
+    const n=nodes[i],R=(n.stage.type==='boss'?30:n.stage.type==='milestone'?27:22)+10;
+    if(Math.hypot(x-n.x,y-n.y)<=R)return{node:n,index:i};
+  }
+  return null;
+}
+
+function onCvMove(e){
+  const {x,y}=getCvXY(e);const hit=hitTest(x,y);
+  const tip=document.getElementById('wm-tooltip');
+  if(hit){
+    wmHoverStageId=hit.node.stage.id;wmCanvas.style.cursor='pointer';
+    const status=getStageStatus(getWorldMap().worlds.find(w=>w.id===wmCurrentWorldId),hit.index);
+    if(tip){tip.textContent=`${hit.node.stage.icon} ${hit.node.stage.name} · ${status}`;tip.style.left=(x+14)+'px';tip.style.top=(y-10)+'px';tip.classList.add('visible');}
+  } else {
+    wmHoverStageId=null;wmCanvas.style.cursor='default';if(tip)tip.classList.remove('visible');
+  }
+}
+function onCvClick(e){const {x,y}=getCvXY(e);const hit=hitTest(x,y);if(hit)openStageDetail(hit.node.stage,hit.index);}
+function onCvTouch(e){const {x,y}=getCvXY(e);const hit=hitTest(x,y);if(hit)openStageDetail(hit.node.stage,hit.index);}
+
+function openStageDetail(stage,index){
+  const wm=getWorldMap(),world=wm.worlds.find(w=>w.id===wmCurrentWorldId);
+  const status=getStageStatus(world,index);
+  wmSelectedStageId=stage.id;
+  const wc=world.color||'#00E5FF';
+  document.getElementById('sd-world-tag').textContent=world.icon+' '+world.name.toUpperCase();
+  document.getElementById('sd-world-tag').style.color=wc;
+  document.getElementById('sd-stage-name').textContent=stage.icon+' '+stage.name;
+  document.getElementById('sd-story-text').textContent=stage.story.replace(/{name}/g,state.playerName);
+  const sb=document.getElementById('sd-status-badge'),tb=document.getElementById('sd-type-badge');
+  const db=document.getElementById('sd-date-badge'),cb=document.getElementById('sd-complete-btn');
+  sb.textContent=status.charAt(0).toUpperCase()+status.slice(1);
+  sb.className='sd-badge '+(status==='completed'?'completed':status==='active'?'active':'locked');
+  tb.textContent=stage.type.charAt(0).toUpperCase()+stage.type.slice(1);
+  tb.className='sd-badge '+(stage.type==='boss'?'boss':stage.type==='milestone'?'current':'active');
+  if(status==='completed'){
+    const cd=wm.completedDates&&wm.completedDates[stage.id];
+    db.textContent=cd?'✅ '+cd:'Completed';db.style.display='';cb.style.display='none';
+  } else if(status==='active'){
+    db.style.display='none';cb.style.display='';cb.textContent='✅ Mark Complete';cb.disabled=false;
+  } else {
+    db.textContent='🔒 Complete previous stage first';db.style.display='';cb.style.display='none';
+  }
+  document.getElementById('stage-detail').classList.add('open');
+}
+function closeStageDetail(){document.getElementById('stage-detail').classList.remove('open');wmSelectedStageId=null;}
+
+function completeCurrentStage(){
+  if(!wmSelectedStageId||!wmCurrentWorldId)return;
+  const wm=getWorldMap(),world=wm.worlds.find(w=>w.id===wmCurrentWorldId);
+  const idx=world.stages.findIndex(s=>s.id===wmSelectedStageId);
+  if(idx<0||getStageStatus(world,idx)!=='active')return;
+  const stage=world.stages[idx];
+  wm.completedStages.push(wmSelectedStageId);
+  wm.completedDates[wmSelectedStageId]=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  state.worldMap=wm;saveState();
+  const xpR=stage.type==='boss'?150:stage.type==='milestone'?100:stage.type==='lore'?30:60;
+  gainXP(xpR);showToast('Stage Complete! +'+xpR+' XP 🗺️');
+  const sb=document.getElementById('sd-status-badge'),db=document.getElementById('sd-date-badge'),cb=document.getElementById('sd-complete-btn');
+  if(sb){sb.textContent='Completed';sb.className='sd-badge completed';}
+  if(db){db.textContent='✅ '+wm.completedDates[wmSelectedStageId];db.style.display='';}
+  if(cb)cb.style.display='none';
+  if(stage.type==='boss'||stage.type==='milestone')spawnConfetti();
+  renderWorldTabs();
+}
+
+function setCurrentWorld(wid){
+  wmCurrentWorldId=wid;closeStageDetail();wmSelectedStageId=null;
+  document.querySelectorAll('.world-tab-btn').forEach(b=>{
+    const isA=b.dataset.wid===wid;b.classList.toggle('active',isA);
+    const w=getWorldMap().worlds.find(w=>w.id===wid);
+    b.style.background=isA?(w&&w.color||'#7B61FF'):'';
+    b.style.borderColor=isA?'transparent':'';
+    b.style.color=isA?'#fff':'';
+  });
+  const world=getWorldMap().worlds.find(w=>w.id===wid);
+  if(world)document.getElementById('wm-world-title').textContent=world.icon+' '+world.name.toUpperCase();
+  stopWmAnimation();resizeCanvas();wmAnimFrame=requestAnimationFrame(drawWorldMap);
+}
+
+function renderWorldTabs(){
+  const wm=getWorldMap();const tabsEl=document.getElementById('world-tabs');if(!tabsEl)return;
+  tabsEl.innerHTML=wm.worlds.map(w=>{
+    const done=wm.completedStages.filter(sid=>w.stages.some(s=>s.id===sid)).length;
+    const isA=w.id===wmCurrentWorldId;
+    return`<button class="world-tab-btn${isA?' active':''}" data-wid="${w.id}" onclick="setCurrentWorld('${w.id}')" style="${isA?'background:'+w.color+';border-color:transparent;color:#fff':''}">${w.icon} ${w.name} <span style="font-size:9px;opacity:0.7">${done}/${w.stages.length}</span></button>`;
+  }).join('');
+  if(!wmCurrentWorldId&&wm.worlds.length>0)setCurrentWorld(wm.worlds[0].id);
+}
+
+function renderStory(){
+  document.getElementById('story-name').textContent=state.playerName;
+  renderWorldTabs();
+}
+
+/* ---- World / Stage Editor ---- */
+function renderWorldEditor(){
+  const wrap=document.getElementById('world-editor-list');if(!wrap)return;
+  const wm=getWorldMap();
+  wrap.innerHTML=wm.worlds.map(w=>{
+    const done=wm.completedStages.filter(sid=>w.stages.some(s=>s.id===sid)).length;
+    return`<div style="background:var(--bg-raised);border:1px solid ${w.color||'var(--border-dim)'};border-radius:10px;padding:14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:22px">${w.icon}</span>
+          <div>
+            <div style="font-family:Orbitron,monospace;font-size:12px;color:${w.color||'#00E5FF'}">${w.name}</div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px">${w.stages.length} stages · ${done} completed · ${w.bg} theme</div>
+          </div>
+        </div>
+        <button class="edit-item-remove" onclick="removeWorld('${w.id}')">✕ Remove World</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${w.stages.map((s,si)=>{const done=isStageCompleted(s.id);const act=getStageStatus(w,si);
+          return`<div style="display:flex;align-items:center;gap:4px;padding:4px 8px;background:var(--bg-deep);border:1px solid ${done?'rgba(74,222,128,0.3)':act==='active'?'rgba(0,229,255,0.2)':'var(--border-dim)'};border-radius:6px;font-size:10px;color:${done?'#4ade80':act==='active'?'var(--accent-cyan)':'var(--text-muted)'}">
+            ${s.icon} ${s.name}<button onclick="removeStage('${w.id}','${s.id}')" style="background:none;border:none;color:var(--accent-red);cursor:pointer;font-size:11px;padding:0 0 0 4px">✕</button></div>`;}).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  const sel=document.getElementById('ns-world-select');
+  if(sel)sel.innerHTML=wm.worlds.map(w=>`<option value="${w.id}">${w.icon} ${w.name}</option>`).join('');
+}
+
+function addNewWorld(){
+  const icon=document.getElementById('nw-icon').value.trim()||'🌍';
+  const name=document.getElementById('nw-name').value.trim();
+  const color=document.getElementById('nw-color').value.trim()||'#7B61FF';
+  const bg=document.getElementById('nw-bg').value||'space';
+  if(!name){alert('World name required.');return;}
+  const wm=getWorldMap();
+  wm.worlds.push({id:'w'+Date.now(),name,icon,color,bg,stages:[]});
+  state.worldMap=wm;saveState();
+  ['nw-icon','nw-name','nw-color'].forEach(i=>document.getElementById(i).value='');
+  renderWorldEditor();renderWorldTabs();showToast('World "'+name+'" created! 🌍');
+}
+function removeWorld(wid){
+  if(!confirm('Remove this world?'))return;
+  const wm=getWorldMap();wm.worlds=wm.worlds.filter(w=>w.id!==wid);state.worldMap=wm;saveState();
+  if(wmCurrentWorldId===wid){wmCurrentWorldId=null;stopWmAnimation();}
+  renderWorldEditor();renderWorldTabs();
+}
+function addStageToWorld(){
+  const wid=document.getElementById('ns-world-select').value;
+  const icon=document.getElementById('ns-icon').value.trim()||'⭐';
+  const name=document.getElementById('ns-name').value.trim();
+  const type=document.getElementById('ns-type').value||'quest';
+  const story=document.getElementById('ns-story').value.trim();
+  if(!name||!story){alert('Stage name and story text required.');return;}
+  const wm=getWorldMap(),world=wm.worlds.find(w=>w.id===wid);if(!world){alert('Select a world.');return;}
+  world.stages.push({id:'s'+Date.now(),name,icon,type,story});
+  state.worldMap=wm;saveState();
+  ['ns-icon','ns-name','ns-story'].forEach(i=>document.getElementById(i).value='');
+  renderWorldEditor();renderWorldTabs();if(wmCurrentWorldId===wid)resizeCanvas();
+  showToast('Stage "'+name+'" added! ⭐');
+}
+function removeStage(wid,sid){
+  const wm=getWorldMap(),world=wm.worlds.find(w=>w.id===wid);
+  if(world)world.stages=world.stages.filter(s=>s.id!==sid);
+  wm.completedStages=(wm.completedStages||[]).filter(id=>id!==sid);
+  state.worldMap=wm;saveState();renderWorldEditor();renderWorldTabs();if(wmCurrentWorldId===wid)resizeCanvas();
+}
+
+/* Keep addAchievementChapter as a no-op stub (achievements no longer add story chapters) */
+function addAchievementChapter(){}
+
+/* ============================================================
+   ACHIEVEMENT UNLOCK — popup + chapter
+   ============================================================ */
+let achQueue=[],achBusy=false;
+function queueAch(ach){achQueue.push(ach);if(!achBusy)drainAch();}
+function drainAch(){if(!achQueue.length){achBusy=false;return;}achBusy=true;showAchPopup(achQueue.shift());}
+
+function showAchPopup(ach){
+  const popup=document.getElementById('ach-popup');
+  document.getElementById('ach-popup-icon').textContent=ach.icon;
+  document.getElementById('ach-popup-name').textContent=ach.title;
+  document.getElementById('ach-popup-desc').textContent=ach.desc;
+  /* Remove old sparkles */
+  popup.querySelectorAll('.ach-sparkle').forEach(s=>s.remove());
+  const inner=popup.querySelector('.ach-popup-inner');
+  /* Add sparkle particles */
+  ['✨','⭐','💫','🌟','✦'].forEach((s,i)=>{
+    const el=document.createElement('span');el.className='ach-sparkle';el.textContent=s;
+    const angle=(i/5)*2*Math.PI;
+    const r=60+Math.random()*30;
+    el.style.cssText=`left:${30+Math.cos(angle)*40}px;top:${30+Math.sin(angle)*30}px;--sx:${Math.cos(angle)*r}px;--sy:${-Math.abs(Math.sin(angle)*r)-20}px;animation-delay:${i*0.1}s`;
+    inner.appendChild(el);
+  });
+  popup.classList.remove('hide');popup.classList.add('show');
+  setTimeout(()=>{popup.classList.add('hide');setTimeout(()=>{popup.classList.remove('show','hide');drainAch();},450);},3800);
+}
+
+function checkAchievements(){
+  const a=state.achievements||[],s=state.stats,before=[...a];
+  state.achievements=a;
+  const add=id=>{if(!a.includes(id))a.push(id);};
+
+  /* Built-in hardcoded triggers (kept for backwards compat) */
+  if(state.totalQuestsCompleted>=1)  add('first_quest');
+  if((s.knowledge||0)>=10)           add('scholar_init');
+  if(state.bossesDefeated>=1)        add('boss_slayer');
+  if(state.streak>=7)                add('week_warrior');
+  if(state.xp>=100)                  add('century_club');
+  if(state.gold>=200)                add('gold_hoarder');
+  if((s.focus||0)>=20)              add('focused_mind');
+  if((s.endurance||0)>=15)          add('endure');
+
+  /* Dynamic trigger-based custom achievements */
+  getAchs().forEach(ach=>{
+    if(!ach.trigger||ach.trigger.type==='manual') return;
+    const {type,value,stat} = ach.trigger;
+    let met = false;
+    if(type==='xp'     && state.xp>=value) met=true;
+    if(type==='quests' && state.totalQuestsCompleted>=value) met=true;
+    if(type==='streak' && state.streak>=value) met=true;
+    if(type==='gold'   && state.gold>=value) met=true;
+    if(type==='stat'   && stat && (s[stat]||0)>=value) met=true;
+    if(met) add(ach.id);
+  });
+
+  a.filter(id=>!before.includes(id)).forEach(id=>{
+    addAchievementChapter(id);
+    const ach=getAchs().find(a=>a.id===id);if(ach)queueAch(ach);
+  });
+  saveState();renderAchievements();renderStory();
+}
+
+/* ============================================================
+   LEVEL UP CINEMATIC
+   ============================================================ */
+let lvlDismissTimer=null;
+function triggerLevelUp(lvl){
+  /* Build rays */
+  const raysEl=document.getElementById('lvl-rays');raysEl.innerHTML='';
+  const N=20;
+  for(let i=0;i<N;i++){
+    const ray=document.createElement('div');ray.className='lvl-ray';
+    const ang=(i/N)*360;const len=120+Math.random()*140;
+    ray.style.cssText=`transform:translate(-50%,0) rotate(${ang}deg);height:${len}px;animation-delay:${i*0.025}s;width:${1+Math.random()*2}px`;
+    raysEl.appendChild(ray);
+  }
+  /* Stars burst */
+  const overlay=document.getElementById('levelup-overlay');
+  const stars=['⭐','✨','💫','🌟','⚡','💥'];
+  for(let i=0;i<18;i++){
+    const s=document.createElement('div');s.className='lvl-star';
+    const ang=(i/18)*2*Math.PI;const r=80+Math.random()*160;
+    s.textContent=stars[Math.floor(Math.random()*stars.length)];
+    s.style.cssText=`left:calc(50% + ${Math.cos(ang)*r}px);top:calc(50% + ${Math.sin(ang)*r}px);--tx:translate(${Math.cos(ang)*60}px,${Math.sin(ang)*60}px);animation-delay:${0.1+i*0.05}s;font-size:${14+Math.random()*16}px`;
+    overlay.appendChild(s);
+  }
+  document.getElementById('lvl-number').textContent=lvl;
+  document.getElementById('lvl-title').textContent=getTitle(lvl);
+  overlay.classList.add('show');
+  spawnConfetti();
+  if(lvlDismissTimer)clearTimeout(lvlDismissTimer);
+  lvlDismissTimer=setTimeout(dismissLevelUp,5000);
+  renderAvatar();
+}
+function dismissLevelUp(){
+  const overlay=document.getElementById('levelup-overlay');
+  overlay.classList.remove('show');
+  overlay.querySelectorAll('.lvl-star').forEach(s=>s.remove());
+  if(lvlDismissTimer)clearTimeout(lvlDismissTimer);
+}
+function spawnConfetti(){
+  const wrap=document.getElementById('confetti-wrap');wrap.innerHTML='';
+  const cols=['#F5A623','#00E5FF','#7B61FF','#FF4757','#4ade80','#fff','#f9a8d4','#fdba74'];
+  for(let i=0;i<90;i++){
+    const p=document.createElement('div');p.className='c-piece';
+    const sz=5+Math.random()*9;
+    p.style.cssText=`left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>0.4?'50%':'2px'};width:${sz}px;height:${sz}px;animation-duration:${1.8+Math.random()*2.2}s;animation-delay:${Math.random()*0.7}s`;
+    wrap.appendChild(p);
+  }
+  setTimeout(()=>wrap.innerHTML='',6000);
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(text){
+  const t=document.createElement('div');t.className='xp-toast';t.textContent=text;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2400);
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+function updateHeader(){
+  const lvl=getLevel();
+  document.getElementById('header-level-badge').textContent=`LV ${lvl}`;
+  document.getElementById('xp-bar-fill').style.width=getXpPct()+'%';
+  document.getElementById('xp-bar-label').textContent=`${getXpInLevel().toLocaleString()} / ${getXpThisLevel().toLocaleString()} XP`;
+  document.getElementById('header-gold').textContent=`🪙 ${state.gold}`;
+  const sw=document.getElementById('shields-wrap');sw.innerHTML='';
+  for(let i=0;i<CONFIG.startingShields;i++){const s=document.createElement('span');s.className='shield-icon'+(i>=state.shields?' used':'');s.textContent=i<state.shields?'🛡️':'💔';sw.appendChild(s);}
+  document.getElementById('playtime-pill').style.display=state.playtimeEarned?'block':'none';
+}
+
+/* ============================================================
+   QUESTS RENDER
+   ============================================================ */
+function renderQuests(){
+  const container=document.getElementById('quest-list'),lootBtn=document.getElementById('loot-box-btn');
+  container.innerHTML='';
+  const todayQ=(state.todayQuests||[]).map(id=>getAllQuests().find(q=>q.id===id)).filter(Boolean);
+  todayQ.forEach(q=>{
+    const done=(state.questsCompletedToday||[]).includes(q.id);
+    const item=document.createElement('div');item.className='quest-item'+(done?' completed':'')+(q.custom?' custom-quest':'');
+    item.innerHTML=`<input type="checkbox" class="quest-checkbox" ${done?'checked disabled':''} onchange="completeQuest(${q.id})"><span class="quest-icon">${q.icon}</span><div class="quest-info"><div class="quest-title">${q.title}${q.custom?' <span class="custom-badge">custom</span>':''}</div><div class="quest-meta"><span class="quest-xp">+${q.xp} XP · +${q.gold} 🪙</span><span class="quest-stat">${getSN(q.stat)}</span></div></div>`;
+    container.appendChild(item);
+  });
+  const allDone=todayQ.length>0&&todayQ.every(q=>(state.questsCompletedToday||[]).includes(q.id));
+  lootBtn.style.display=allDone?'block':'none';
+}
+
+/* ============================================================
+   LOOT BOX
+   ============================================================ */
+function openLootBox(){
+  const r=CONFIG.lootPool[Math.floor(Math.random()*CONFIG.lootPool.length)];
+  document.getElementById('loot-icon').textContent=r.type==='xp'?'✨':r.type==='gold'?'🪙':r.type==='shield'?'🛡️':'🌟';
+  document.getElementById('loot-rarity').className='loot-rarity rarity-'+r.rarity;
+  document.getElementById('loot-rarity').textContent=r.rarity.toUpperCase();
+  document.getElementById('loot-label').textContent=r.label;
+  document.getElementById('loot-modal').classList.add('show');
+  if(r.type==='xp')gainXP(r.value);else if(r.type==='gold')gainGold(r.value);else if(r.type==='shield'){state.shields=Math.min(CONFIG.startingShields,state.shields+r.value);saveState();updateHeader();}
+}
+function closeLoot(){document.getElementById('loot-modal').classList.remove('show');}
+
+/* Boss battle removed */
+
+/* ============================================================
+   SKILL TREE
+   ============================================================ */
+function renderSkillTree(){
+  const wrap=document.getElementById('skill-trees-wrap');wrap.innerHTML='';
+  Object.entries(CONFIG.skillTrees).forEach(([name,tree])=>{
+    const val=state.stats[tree.stat]||0,th=CONFIG.skillUnlockThresholds;
+    const card=document.createElement('div');card.className='card skill-tree-card';
+    let html=`<div class="tree-title">${name} Path</div>`;
+    tree.nodes.forEach((node,i)=>{
+      const unlocked=val>=th[i],cur=unlocked&&(i===tree.nodes.length-1||val<th[i+1]);
+      if(i>0)html+=`<div class="skill-connector ${val>=th[i-1]?'active':''}"></div>`;
+      html+=`<div class="skill-node-tip">${node.tip}</div><div class="skill-node${cur?' current':unlocked?' unlocked':''}"><span class="sn-icon">${node.icon}</span><span class="sn-label">${node.label}</span></div>`;
+    });
+    card.innerHTML=html;wrap.appendChild(card);
+  });
+}
+
+/* ============================================================
+   ACHIEVEMENTS — inline edit, add, trigger system
+   ============================================================ */
+
+let achEditOpen = false;
+
+function toggleAchEditMode(){
+  achEditOpen = !achEditOpen;
+  const editor = document.getElementById('ach-inline-editor');
+  const btn    = document.getElementById('ach-edit-toggle-btn');
+  if(achEditOpen){
+    editor.style.display = 'block';
+    btn.textContent = '✕ Close Editor';
+    btn.className = 'btn btn-sm btn-danger';
+    renderAchEditRows();
+  } else {
+    editor.style.display = 'none';
+    btn.textContent = '✏️ Edit Awards';
+    btn.className = 'btn btn-gold btn-sm';
+  }
+}
+
+function renderAchEditRows(){
+  const wrap = document.getElementById('ach-edit-rows');
+  if(!wrap) return;
+  const defs = getAchs();
+  const unlocked = state.achievements || [];
+  wrap.innerHTML = defs.map((a,i) => {
+    const isUnlocked = unlocked.includes(a.id);
+    return `<div style="display:grid;grid-template-columns:52px 1fr 1fr auto auto;gap:8px;align-items:center;padding:10px 12px;background:var(--bg-raised);border:1px solid ${isUnlocked?'rgba(245,166,35,0.3)':'var(--border-dim)'};border-radius:8px;margin-bottom:8px">
+      <input type="text" id="ae-icon-${i}" value="${a.icon}" maxlength="4" style="text-align:center;font-size:20px;padding:4px;background:var(--bg-deep)">
+      <input type="text" id="ae-title-${i}" value="${a.title}" placeholder="Title" style="font-size:12px;background:var(--bg-deep);border:1px solid var(--border-dim);border-radius:6px;padding:6px 8px;color:var(--text-primary)">
+      <input type="text" id="ae-desc-${i}" value="${a.desc}" placeholder="Description" style="font-size:11px;background:var(--bg-deep);border:1px solid var(--border-dim);border-radius:6px;padding:6px 8px;color:var(--text-muted)">
+      <button onclick="manualGrantAch('${a.id}')" style="background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:var(--accent-green);font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap" ${isUnlocked?'disabled title="Already unlocked"':''}>
+        ${isUnlocked?'✅ Done':'🏆 Grant'}
+      </button>
+      ${a.custom?`<button onclick="removeAchievement('${a.id}')" class="edit-item-remove">✕</button>`:'<span></span>'}
+    </div>
+    <div style="padding:4px 12px 10px;background:var(--bg-raised);margin-top:-8px;border:1px solid var(--border-dim);border-top:none;border-radius:0 0 8px 8px;margin-bottom:8px">
+      <input type="text" id="ae-story-${i}" value="${(a.story||'').replace(/"/g,'&quot;')}" placeholder="Story sentence (use {name})" style="font-size:11px;background:var(--bg-deep);border:1px solid var(--border-dim);border-radius:6px;padding:5px 10px;color:var(--text-muted);width:100%">
+    </div>`;
+  }).join('');
+}
+
+function saveAchievementsInline(){
+  const defs = getAchs();
+  defs.forEach((a,i) => {
+    const icon  = document.getElementById('ae-icon-'+i)?.value.trim();
+    const title = document.getElementById('ae-title-'+i)?.value.trim();
+    const desc  = document.getElementById('ae-desc-'+i)?.value.trim();
+    const story = document.getElementById('ae-story-'+i)?.value.trim();
+    if(icon)  a.icon  = icon;
+    if(title) a.title = title;
+    if(desc)  a.desc  = desc;
+    if(story) a.story = story;
+  });
+  state.achievementDefs = defs;
+  saveState(); renderAchievements(); showToast('Awards saved! 🏆');
+  toggleAchEditMode();
+}
+
+function addNewAchievement(){
+  const icon   = document.getElementById('na-icon').value.trim() || '🌟';
+  const title  = document.getElementById('na-title').value.trim();
+  const desc   = document.getElementById('na-desc').value.trim();
+  const ttype  = document.getElementById('na-trigger-type').value;
+  const tval   = parseInt(document.getElementById('na-trigger-val').value) || 0;
+  const tstat  = document.getElementById('na-trigger-stat').value || '';
+  const story  = document.getElementById('na-story').value.trim() || `{name} earned the ${title||'Award'} through sheer dedication.`;
+  if(!title){ alert('Award title is required.'); return; }
+  const id = 'custom_'+Date.now();
+  const newAch = { id, icon, title, desc: desc||title, story,
+    trigger: { type: ttype, value: tval, stat: tstat }, custom: true };
+  if(!state.achievementDefs) state.achievementDefs = JSON.parse(JSON.stringify(CONFIG.achievements));
+  state.achievementDefs.push(newAch);
+  saveState(); renderAchievements(); renderAchEditRows();
+  ['na-icon','na-title','na-desc','na-story','na-trigger-val'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  showToast(`Award "${title}" added! 🌟`);
+}
+
+function removeAchievement(id){
+  if(!confirm('Remove this award?')) return;
+  state.achievementDefs = (state.achievementDefs||[]).filter(a=>a.id!==id);
+  state.achievements    = (state.achievements||[]).filter(aid=>aid!==id);
+  saveState(); renderAchievements(); renderAchEditRows();
+  showToast('Award removed');
+}
+
+function manualGrantAch(id){
+  if((state.achievements||[]).includes(id)) return;
+  state.achievements = state.achievements||[];
+  state.achievements.push(id);
+  addAchievementChapter(id);
+  const ach = getAchs().find(a=>a.id===id);
+  if(ach) queueAch(ach);
+  saveState(); renderAchievements(); renderAchEditRows(); renderStory();
+  showToast('Award granted! 🏆');
+}
+
+function renderAchievements(){
+  const grid = document.getElementById('achievements-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const defs    = getAchs();
+  const unlocked = state.achievements||[];
+  defs.forEach(ach => {
+    const isUnlocked = unlocked.includes(ach.id);
+    const d = document.createElement('div');
+    d.className = 'achievement-badge '+(isUnlocked?'unlocked':'locked');
+    /* Show trigger hint on locked badges */
+    let hint = '';
+    if(!isUnlocked && ach.trigger && ach.trigger.type && ach.trigger.type!=='manual'){
+      const ttype = ach.trigger.type;
+      const tval  = ach.trigger.value;
+      const tstat = ach.trigger.stat;
+      const labels = {xp:`${tval} XP`,quests:`${tval} quests`,streak:`${tval}-day streak`,gold:`${tval} gold`,stat:`${getSN(tstat||'')} ≥ ${tval}`};
+      hint = `<div style="font-size:9px;color:rgba(107,114,128,0.7);margin-top:5px;font-family:'JetBrains Mono',monospace">Needs: ${labels[ttype]||''}</div>`;
+    }
+    d.innerHTML = `<span class="ach-icon">${ach.icon}</span><div class="ach-title">${ach.title}</div><div class="ach-desc">${ach.desc}</div>${hint}`;
+    grid.appendChild(d);
+  });
+}
+
+/* ============================================================
+   STAT RINGS & BARS
+   ============================================================ */
+function renderStatRings(){
+  const wrap=document.getElementById('stats-rings-wrap');wrap.innerHTML='';
+  const circ=2*Math.PI*26;
+  CONFIG.statKeys.forEach(k=>{
+    const color=CONFIG.statColors[k]||'#00E5FF';
+    const raw=state.stats[k]||0;
+    const pct=getStatDisplay(raw)/100;  /* 0–1 normalized */
+    const offset=circ*(1-pct);
+    const tier=getStatTier(raw);
+    const dr=Math.max(5,Math.round(Math.pow(0.7,tier)*100));
+    const d=document.createElement('div');d.className='stat-ring-wrap';
+    d.innerHTML=`<div class="stat-ring"><svg viewBox="0 0 64 64"><circle class="stat-ring-bg" cx="32" cy="32" r="26"/><circle class="stat-ring-fill" cx="32" cy="32" r="26" style="stroke:${color};stroke-dasharray:${circ.toFixed(1)};stroke-dashoffset:${offset.toFixed(1)}"/></svg><div class="stat-ring-val" style="color:${color}">${Math.floor(getStatDisplay(raw))}</div></div><div class="stat-ring-label">${getSN(k)}<br><span style="color:var(--accent-gold);font-size:8px">T${tier+1} · ${dr}%</span></div>`;
+    wrap.appendChild(d);
+  });
+}
+function renderStatBars(){
+  const wrap=document.getElementById('stat-bars-wrap');wrap.innerHTML='';
+  CONFIG.statKeys.forEach(k=>{
+    const raw=state.stats[k]||0;
+    const pct=getStatDisplay(raw);
+    const tier=getStatTier(raw);
+    const dr=Math.max(5,Math.round(Math.pow(0.7,tier)*100));
+    const tierPts=statPtsForTier(tier);
+    const inTier=raw-totalStatPtsForTier(tier);
+    const d=document.createElement('div');d.className='stat-bar-wrap';
+    d.innerHTML=`<div class="stat-bar-info"><span>${getSN(k)} <span style="font-size:9px;color:var(--accent-gold)">Tier ${tier+1}/10 · DR ${dr}%</span></span><span style="font-family:'JetBrains Mono',monospace;font-size:10px">${inTier.toFixed(1)}/${tierPts} in tier</span></div><div class="stat-bar-track"><div class="stat-bar-fill" style="width:${pct}%"></div></div>`;
+    wrap.appendChild(d);
+  });
+}
+function renderDashboard(){
+  const grid=document.getElementById('dashboard-stats-grid');
+  [{val:getLevel(),label:'Level'},{val:state.xp.toLocaleString(),label:'Total XP'},{val:state.gold,label:'Gold'},{val:state.streak,label:'Day Streak'},{val:state.totalQuestsCompleted,label:'Quests Done'},{val:state.bossesDefeated,label:'Bosses Slain'}].forEach(s=>{
+    const d=document.createElement('div');d.className='dash-stat';d.innerHTML=`<div class="dash-stat-val">${s.val}</div><div class="dash-stat-label">${s.label}</div>`;grid.appendChild(d);
+  });
+}
+
+/* ============================================================
+   AVATAR — photo upload or CSS-drawn
+   ============================================================ */
+function renderAvatar(){
+  const lvl=getLevel();
+  const photoEl=document.getElementById('avatar-photo');
+  const svgWrap=document.getElementById('avatar-svg-wrap');
+  const rmBtn=document.getElementById('remove-photo-btn');
+  if(state.avatarPhoto){
+    photoEl.src=state.avatarPhoto;photoEl.style.display='block';svgWrap.style.display='none';if(rmBtn)rmBtn.style.display='';
+  }else{
+    photoEl.style.display='none';svgWrap.style.display='block';if(rmBtn)rmBtn.style.display='none';
+    const skins=['#F5C9A0','#E8B98A','#D4A574','#C49A6C','#B8860B'];
+    const glows=['#00E5FF','#7B61FF','#F5A623','#FF4757','#4ade80'];
+    const armors=['#2d3561','#1a6b8a','#7b3fa0','#c0392b'];
+    const skin=skins[Math.min(Math.floor(lvl/3),4)];
+    const glow=glows[Math.min(Math.floor(lvl/3),4)];
+    const armor=armors[Math.min(Math.floor(lvl/5),3)];
+    const crown=lvl>=15;
+    const svg=document.getElementById('avatar-svg');
+    svg.innerHTML=`
+      <circle cx="60" cy="70" r="50" fill="${glow}" opacity="0.08"/>
+      <rect x="30" y="75" width="60" height="55" rx="8" fill="${armor}" opacity="0.9"/>
+      <rect x="30" y="112" width="60" height="8" fill="${glow}" opacity="0.6"/>
+      <rect x="52" y="65" width="16" height="18" rx="4" fill="${skin}"/>
+      <ellipse cx="60" cy="52" rx="24" ry="26" fill="${skin}"/>
+      <ellipse cx="60" cy="30" rx="24" ry="12" fill="#2c1810"/>
+      <circle cx="51" cy="52" r="4" fill="#1a1a2e"/><circle cx="69" cy="52" r="4" fill="#1a1a2e"/>
+      <circle cx="52" cy="51" r="1.5" fill="white"/><circle cx="70" cy="51" r="1.5" fill="white"/>
+      <path d="M52 62 Q60 68 68 62" stroke="#8b6552" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <rect x="12" y="78" width="18" height="40" rx="8" fill="${armor}"/>
+      <rect x="90" y="78" width="18" height="40" rx="8" fill="${armor}"/>
+      <circle cx="21" cy="122" r="8" fill="${skin}"/><circle cx="99" cy="122" r="8" fill="${skin}"/>
+      <circle cx="60" cy="95" r="10" fill="${glow}" opacity="0.85"/>
+      <text x="60" y="99" text-anchor="middle" font-family="Orbitron" font-size="9" fill="white" font-weight="bold">${lvl}</text>
+      ${crown?`<polygon points="36,30 48,14 60,26 72,14 84,30" fill="${glow}" opacity="0.9"/>
+      <circle cx="48" cy="14" r="3" fill="#fff"/><circle cx="60" cy="26" r="3" fill="#fff"/><circle cx="72" cy="14" r="3" fill="#fff"/>`:''}
+      ${lvl>=10?`<circle cx="60" cy="52" r="28" fill="none" stroke="${glow}" stroke-width="2" opacity="0.4"/>`:''}`;
+  }
+  document.getElementById('profile-level-badge').textContent=lvl;
+  document.getElementById('player-name-display').textContent=state.playerName;
+  document.getElementById('player-title-display').textContent=getTitle(lvl);
+}
+
+function handleAvatarUpload(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{state.avatarPhoto=e.target.result;saveState();renderAvatar();showToast('Avatar updated! 📸');};
+  reader.readAsDataURL(file);event.target.value='';
+}
+function removeAvatarPhoto(){state.avatarPhoto=null;saveState();renderAvatar();showToast('Avatar reset to default');}
+
+/* ============================================================
+   NAME
+   ============================================================ */
+function focusNameInput(){switchTab('profile');setTimeout(()=>{const el=document.getElementById('name-input');el.value=state.playerName;el.focus();},200);}
+function saveName(){const v=document.getElementById('name-input').value.trim();if(v){state.playerName=v;saveState();renderAvatar();renderStory();showToast('Name saved! ✅');}}
+
+/* ============================================================
+   PLAYTIME
+   ============================================================ */
+let ptInterval=null;
+function checkPlaytimeUnlock(xp){
+  state.xpSinceLastPlaytime=(state.xpSinceLastPlaytime||0)+xp;
+  const t=state.playtimeXpThreshold||CONFIG.playtimeXpThreshold;
+  if(state.xpSinceLastPlaytime>=t&&!state.playtimeEarned){
+    state.playtimeEarned=true;state.playtimeSecondsLeft=(state.playtimeMinutes||CONFIG.playtimeMinutes)*60;
+    saveState();updateHeader();showToast('🎮 Playtime Unlocked!');
+  }
+  updatePtStatus();
+}
+function updatePtStatus(){
+  const el=document.getElementById('pt-feedback');if(!el)return;
+  const t=state.playtimeXpThreshold||CONFIG.playtimeXpThreshold,x=state.xpSinceLastPlaytime||0;
+  el.innerHTML=state.playtimeEarned?`<span style="color:var(--accent-green)">🎮 Playtime earned! ${Math.floor((state.playtimeSecondsLeft||0)/60)}m left.</span>`:`XP towards next playtime: ${x} / ${t}`;
+  const lbl=document.getElementById('pt-xp-label');if(lbl)lbl.textContent=`XP towards next playtime: ${x} / ${t}`;
+}
+function openPlaytime(){if(!state.playtimeEarned)return;document.getElementById('playtime-modal').classList.add('show');startPtCountdown();}
+function closePlaytime(){
+  document.getElementById('playtime-modal').classList.remove('show');
+  if(ptInterval)clearInterval(ptInterval);
+  if((state.playtimeSecondsLeft||0)<=0){state.playtimeEarned=false;state.xpSinceLastPlaytime=0;updateHeader();saveState();}
+}
+function startPtCountdown(){
+  if(ptInterval)clearInterval(ptInterval);renderPtTimer();
+  ptInterval=setInterval(()=>{
+    if((state.playtimeSecondsLeft||0)>0){state.playtimeSecondsLeft--;renderPtTimer();if(state.playtimeSecondsLeft%10===0)saveState();}
+    else{clearInterval(ptInterval);state.playtimeEarned=false;state.xpSinceLastPlaytime=0;saveState();updateHeader();document.getElementById('playtime-modal').classList.remove('show');showToast('Playtime over! Back to work 💪');}
+  },1000);
+}
+function renderPtTimer(){
+  const s=state.playtimeSecondsLeft||0,m=Math.floor(s/60),sec=s%60,total=(state.playtimeMinutes||CONFIG.playtimeMinutes)*60;
+  document.getElementById('pt-timer-display').textContent=`${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  document.getElementById('pt-bar-fill').style.width=Math.max(0,(s/total)*100)+'%';
+}
+function savePlaytimeConfig(){
+  const x=parseInt(document.getElementById('pt-xp-input').value),m=parseInt(document.getElementById('pt-min-input').value);
+  if(x>=100&&m>=5){state.playtimeXpThreshold=x;state.playtimeMinutes=m;saveState();updatePtStatus();showToast('Playtime config saved! 🎮');}
+}
+
+/* ============================================================
+   EDIT LISTS
+   ============================================================ */
+function renderEditLists(){
+  /* Custom quests */
+  const cql=document.getElementById('custom-quests-list');cql.innerHTML='';
+  if(!state.customQuests||state.customQuests.length===0){cql.innerHTML='<div class="text-muted" style="padding:8px">No custom quests yet. Add one below.</div>';}
+  else{state.customQuests.forEach(q=>{const d=document.createElement('div');d.className='edit-item';d.innerHTML=`<span class="edit-item-icon">${q.icon}</span><span class="edit-item-name">${q.title}</span><span class="edit-item-meta">+${q.xp}xp · ${getSN(q.stat)}</span><button class="edit-item-remove" onclick="removeCustomQuest(${q.id})">✕</button>`;cql.appendChild(d);});}
+
+  /* World map editor */
+  renderWorldEditor();
+  /* Config inputs */
+  const ptX=document.getElementById('pt-xp-input');const ptM=document.getElementById('pt-min-input');
+  if(ptX)ptX.value=state.playtimeXpThreshold||CONFIG.playtimeXpThreshold;
+  if(ptM)ptM.value=state.playtimeMinutes||CONFIG.playtimeMinutes;
+  /* Remove stale xp-per-level-input references — now handled by saveScalingCfg */
+  const cxpl=document.getElementById('current-xpl');if(cxpl)cxpl.textContent=xpForLevel(getLevel()).toLocaleString();
+  const sptInp=document.getElementById('stat-per-tier-input');if(sptInp)sptInp.value=getStatPerTier();
+  const cspt=document.getElementById('current-spt');if(cspt)cspt.textContent=getStatPerTier();
+  updatePtStatus();renderStatNameEditor();renderAchievementEditor();renderPenaltyPresets();renderPenaltyLog();populateScalingInputs();renderScalingPreview();
+}
+
+/* ============================================================
+   TODAY'S QUEST PICKER
+   ============================================================ */
+function renderTodayPicker(){
+  const wrap=document.getElementById('today-quest-picker');
+  if(!wrap)return;
+  const all=getAllQuests();
+  wrap.innerHTML=all.map(q=>`
+    <label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg-raised);border:1px solid var(--border-dim);border-radius:7px;margin-bottom:6px;cursor:pointer">
+      <input type="checkbox" value="${q.id}" ${(state.todayQuests||[]).includes(q.id)?'checked':''} style="width:18px;height:18px;accent-color:var(--accent-cyan)">
+      <span style="font-size:16px">${q.icon}</span>
+      <span style="flex:1;font-size:12px">${q.title}${q.custom?' <span class="custom-badge">custom</span>':''}</span>
+      <span style="font-family:JetBrains Mono,monospace;font-size:10px;color:var(--accent-gold)">+${q.xp}xp</span>
+    </label>`).join('');
+}
+function saveQuestPicker(){
+  const boxes=document.querySelectorAll('#today-quest-picker input[type=checkbox]');
+  const chosen=[];boxes.forEach(b=>{if(b.checked)chosen.push(parseInt(b.value));});
+  if(chosen.length===0){alert('Pick at least one quest.');return;}
+  state.todayQuests=chosen;state.questsCompletedToday=(state.questsCompletedToday||[]).filter(id=>chosen.includes(id));
+  saveState();renderQuests();showToast("Today's quests updated! ⚔️");
+}
+
+/* ============================================================
+   RESET
+   ============================================================ */
+function resetProgress(){
+  if(confirm('Reset ALL progress? This cannot be undone.')){
+    localStorage.removeItem(SK);if(ptInterval)clearInterval(ptInterval);
+    state=defaultState();initApp();
+  }
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function switchTab(tabId){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab,.mobile-nav-btn').forEach(b=>b.classList.remove('active'));
+  const panel=document.getElementById('panel-'+tabId);if(panel)panel.classList.add('active');
+  document.querySelectorAll(`[data-tab="${tabId}"]`).forEach(b=>b.classList.add('active'));
+  if(tabId==='edit'){renderEditLists();renderTodayPicker();}
+  if(tabId==='story'){renderStory();stopWmAnimation();setTimeout(()=>{resizeCanvas();if(wmCurrentWorldId)wmAnimFrame=requestAnimationFrame(drawWorldMap);else renderWorldTabs();},80);}
+  if(tabId==='profile'){renderAvatar();renderStatRings();}
+  if(tabId==='stats'){document.getElementById('dashboard-stats-grid').innerHTML='';renderDashboard();}
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function initApp(){
+  loadState();checkStreak();ensureTodayQuests();
+  if(state.customQuests?.length)cqSeq=Math.max(cqSeq,...state.customQuests.map(q=>q.id));
+  if(state.customBosses?.length)cbSeq=Math.max(cbSeq,...state.customBosses.map(b=>b.id));
+  saveState();
+  document.getElementById('app-name-label').textContent=CONFIG.appName.replace(' RPG','').toUpperCase();
+  document.title=CONFIG.appName;
+  updateHeader();renderQuests();renderSkillTree();
+  renderAchievements();renderDashboard();renderStatBars();renderStatRings();renderAvatar();renderStory();
+  /* Init world map canvas */
+  setTimeout(()=>{initWorldMapCanvas();renderWorldTabs();},100);
+  if(state.playtimeEarned)document.getElementById('playtime-pill').style.display='block';
+  updatePtStatus();
+}
+initApp();
+</script>
+</body>
+</html>
